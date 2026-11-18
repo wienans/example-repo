@@ -77,6 +77,7 @@ An edge label is a verb phrase or the name of what crosses the edge: a function,
 - Every subgraph has an explicit ID, as in `subgraph dom [src/domain]`.
 - An edge that crosses a subgraph boundary points at the subgraph, not at a node inside it. The exception is a stack of layers, where the edge must show which node breaks or follows the rule.
 - No subgraph wraps a single node.
+- A C4 container is a separately deployable unit, such as an executable. Source sets, libraries and HAL ports are not containers. They appear on the component view or in a container's description.
 - Quote every label: `ctl["⚙️ motor_control"]`. Quotes avoid parse errors from parentheses and from the words `end`, `o` and `x` at the start of an ID.
 - `linkStyle` is not allowed. Index-based styles break when an edge is added.
 - A reversed arrow such as `hal <-.- port` renders with no arrowhead. To place `port` below `hal` while the arrow points up, add an invisible link `hal ~~~ port` and draw `port -.-> hal`.
@@ -86,7 +87,7 @@ An edge label is a verb phrase or the name of what crosses the edge: a function,
 | View | Mermaid type | Reader |
 | --- | --- | --- |
 | C4 system context | `flowchart` | Overview |
-| C4 containers | `flowchart` with subgraphs | Overview |
+| C4 containers | `flowchart` with one boundary subgraph | Overview |
 | C4 components | `flowchart` with one subgraph per layer | Technical |
 | Include rule | `flowchart` with one subgraph per layer | Technical |
 | Call order in one control tick | `sequenceDiagram` with one `box` per layer | Technical |
@@ -96,7 +97,7 @@ An edge label is a verb phrase or the name of what crosses the edge: a function,
 
 | Topic | design-doc-mermaid | mastery-of-mermaid | Choice here | Reason |
 | --- | --- | --- | --- | --- |
-| C4 notation | C4 views as `flowchart` | Native `C4Context` and friends | `flowchart` | Native C4 types cannot take `classDef`, so they cannot follow the palette |
+| C4 notation | C4 views as `flowchart` | Native `C4Context` by default, `flowchart` when C4 drops a relationship | `flowchart` | Native C4 dropped the firmware-to-power-stage relation and labeled hardware as software. See [ADR-0007](../adr/0007-c4-views-as-flowcharts.md) |
 | Palette | Light fills, dark text | Medium fills, same-hue text | Light fills, dark text | Measured: two mastery-of-mermaid roles fall below 4.5 (`queue` 3.79, `consumer` 3.91). Every design-doc-mermaid table color passes |
 | Symbols | On every node | Not mentioned | One per element type, always next to the name | Keeps the meaning when the emoji does not render |
 | Published form | `.mmd` plus a PNG embedded as an image | `.mmd` or a fenced block | Fenced block in the Markdown page | StrictDoc and GitHub render fenced blocks. A committed PNG drifts from its source. `make diagrams` still writes `.mmd` and `.svg` files to `build/diagrams/` |

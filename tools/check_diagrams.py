@@ -112,7 +112,8 @@ def structure_errors(lines: list[str]) -> list[str]:
     errors = []
     kind = lines[0].split()[0] if lines else ""
     if kind not in ALLOWED_TYPES:
-        errors.append(f"diagram type {kind!r} is not one of {sorted(ALLOWED_TYPES)}")
+        hint = ". Draw C4 views as flowcharts, see docs/adr/0007-c4-views-as-flowcharts.md" if kind.startswith("C4") else ""
+        errors.append(f"diagram type {kind!r} is not one of {sorted(ALLOWED_TYPES)}{hint}")
     if len(lines) < 3 or not lines[1].startswith("accTitle:") or not lines[2].startswith("accDescr:"):
         errors.append("the two lines after the type keyword must be accTitle: and accDescr:")
     body = lines[1:]

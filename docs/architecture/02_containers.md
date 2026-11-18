@@ -1,52 +1,42 @@
 # Containers
 
-One source tree builds three executables. They share the same `app`, `domain`, `middleware` and `bsp` sources and differ only in what stands behind the HAL headers. That shared code is the evidence for the portability requirement [LINK: SYS-006].
+One source tree builds three executables. All three compile the same `app`, `domain`, `middleware` and `bsp` sources. They differ only in what stands behind the HAL headers. That shared code is the evidence for the portability requirement [LINK: SYS-006].
 
-This overview diagram answers one question: which executable links which HAL implementation. Arrows point from the source code to the executable built from it. The arrow into the **Executables** box means all three executables compile the shared sources.
+This overview diagram shows the three executables and who runs each one. The second line of each box names the HAL implementation that the executable links. Arrows point the way a command or signal travels.
 
 ```mermaid
 flowchart TB
-  accTitle: Executables built from the shared firmware sources
-  accDescr: The shared firmware sources are compiled into all three executables. Each executable links one HAL implementation. The target firmware links an MCU HAL port, which the repo does not contain yet. The host simulator links the host HAL port. The unit test runners link CMock mocks generated from the HAL headers. The target firmware drives the motor control board.
+  accTitle: Executables built from the firmware sources
+  accDescr: The repository builds three executables. The target firmware links an MCU HAL port, which the repo does not contain yet, and drives the motor control board. The developer runs the host simulator, which links the host HAL port, and the unit test runners, which link CMock mocks of the HAL headers.
   classDef boundary fill:#FFFFFF,stroke:#666666,stroke-width:1px,stroke-dasharray:5 5,color:black
+  classDef person fill:#FFE4B5,stroke:#FF8C00,stroke-width:2px,color:black
   classDef firmware fill:#90EE90,stroke:#2E7D2E,stroke-width:2px,color:darkgreen
-  classDef platform fill:#E6E6FA,stroke:#8A2BE2,stroke-width:2px,color:darkblue
   classDef hardware fill:#F0F0F0,stroke:#333333,stroke-width:2px,color:black
   classDef tooling fill:#FFD700,stroke:#B8860B,stroke-width:2px,color:black
 
-  shared["⚙️ Shared firmware sources<br/>[C99]<br/>src/app, src/domain, src/middleware, src/bsp"]
+  dev["👤 Developer<br/>[Person]<br/>Builds, tests and simulates"]
 
-  subgraph hals [HAL implementations]
-    direction LR
-    mcuport["🔧 MCU HAL port<br/>[C99]<br/>src/hal/port/&lt;mcu&gt;, not written yet"]
-    hostport["🔧 Host HAL port<br/>[C99]<br/>src/hal/port/host, with a motor plant model"]
-    mocks["🛠️ HAL mocks<br/>[CMock]<br/>Generated from src/hal/*.h"]
+  subgraph repo [example-repo]
+    target["⚙️ Target firmware<br/>[Container: MCU image]<br/>Links src/hal/port/&lt;mcu&gt;, not written yet"]
+    sim["⚙️ Host simulator<br/>[Container: Linux executable]<br/>Links src/hal/port/host and a motor model"]
+    tests["🛠️ Unit test runners<br/>[Container: Ceedling, Unity, CMock]<br/>Link CMock mocks of src/hal/*.h"]
   end
 
-  subgraph outputs [Executables]
-    direction LR
-    target["⚙️ Target firmware<br/>[Container: MCU image]<br/>Runs on the board"]
-    sim["⚙️ Host simulator<br/>[Container: Linux executable]<br/>make sim"]
-    tests["🛠️ Unit test runners<br/>[Container: Ceedling, Unity]<br/>make test"]
-  end
+  board["🔩 Motor control board<br/>[Hardware]<br/>MCU, H-bridge, encoder, buttons"]
 
-  board["🔩 Motor control board<br/>[Hardware]"]
+  dev -->|"Runs<br/>make sim"| sim
+  dev -->|"Runs<br/>make test"| tests
+  target -->|"Drives<br/>PWM, GPIO, ADC, timer"| board
 
-  mcuport -->|"linked into"| target
-  hostport -->|"linked into"| sim
-  mocks -->|"linked into"| tests
-  shared -->|"compiled into"| outputs
-  target -->|"PWM, GPIO, ADC, timer"| board
-
-  class hals,outputs boundary
-  class shared,target,sim firmware
-  class hostport platform
-  class mocks,tests tooling
+  class repo boundary
+  class dev person
+  class target,sim firmware
+  class tests tooling
   class board hardware
-  style mcuport fill:#E6E6FA,stroke:#8A2BE2,stroke-width:2px,stroke-dasharray:5 5,color:darkblue
+  style target fill:#90EE90,stroke:#2E7D2E,stroke-width:2px,stroke-dasharray:5 5,color:darkgreen
 ```
 
-The dashed border marks the MCU port as planned work. [Port the firmware to a new MCU](06_porting_guide.md) lists the files it needs.
+The dashed border marks the target firmware as planned work. Its MCU port does not exist yet. [Port the firmware to a new MCU](06_porting_guide.md) lists the files the port needs. The source sets and HAL ports are not containers, because none of them is deployed on its own. They appear on the [component page](03_components.md).
 
 | Container | Command | HAL implementation | Purpose |
 | --- | --- | --- | --- |
@@ -54,3 +44,5 @@ The dashed border marks the MCU port as planned work. [Port the firmware to a ne
 | Host simulator | `make sim` | `src/hal/port/host/` | Closed-loop check of [LINK: SYS-001] and [LINK: SYS-004] without hardware |
 | Unit test runners | `make test` | CMock mocks of `src/hal/*.h` and `src/bsp/bsp.h` | Behavior of each module, see [LINK: SYS-008] |
 | Documentation site | `make docs` | None | Requirements, architecture, ADRs and the API reference in `build/strictdoc` and `build/doxygen` |
+
+[ADR-0007](../adr/0007-c4-views-as-flowcharts.md) explains why this C4 view is a flowchart and not a native `C4Container` diagram.
