@@ -1,0 +1,113 @@
+[DOCUMENT]
+TITLE: System requirements
+UID: DOC-SYS
+OPTIONS:
+  ENABLE_MID: False
+  VIEW_STYLE: Table
+
+[[SECTION]]
+TITLE: Purpose
+
+[TEXT]
+STATEMENT: >>>
+This document states what the motor control system must do, as seen by the
+operator and by the team that ports the firmware to a new board. The software
+requirements in ``software_requirements.sdoc`` refine each item here.
+<<<
+
+[[/SECTION]]
+
+[[SECTION]]
+TITLE: Motor control
+
+[REQUIREMENT]
+UID: SYS-001
+TITLE: Closed-loop speed control
+STATEMENT: >>>
+The system shall hold the motor shaft speed within 2 % of the commanded
+setpoint in steady state, and shall settle to that band within 1 s of a start
+command.
+<<<
+RATIONALE: >>>
+The driven load needs a known speed. Open-loop duty control drifts with supply
+voltage and load torque.
+<<<
+
+[REQUIREMENT]
+UID: SYS-002
+TITLE: Operator start and stop
+STATEMENT: >>>
+The system shall start the motor when the operator presses the start button,
+and shall stop the motor when the operator presses the stop button.
+<<<
+
+[[/SECTION]]
+
+[[SECTION]]
+TITLE: Protection
+
+[REQUIREMENT]
+UID: SYS-003
+TITLE: Overcurrent protection
+STATEMENT: >>>
+The system shall disable the motor drive within one control period when the
+motor current exceeds the configured limit.
+<<<
+RATIONALE: >>>
+Sustained overcurrent damages the H-bridge and the motor windings.
+<<<
+
+[REQUIREMENT]
+UID: SYS-004
+TITLE: Stall protection
+STATEMENT: >>>
+The system shall disable the motor drive when the motor is driven but does not
+turn for a configured time.
+<<<
+
+[REQUIREMENT]
+UID: SYS-005
+TITLE: Fault recovery
+STATEMENT: >>>
+After a fault, the system shall keep the drive disabled until the operator
+presses the stop button to acknowledge the fault.
+<<<
+
+[[/SECTION]]
+
+[[SECTION]]
+TITLE: Quality attributes
+
+[REQUIREMENT]
+UID: SYS-006
+TITLE: Platform portability
+STATEMENT: >>>
+The application and domain logic shall build without change for any MCU that
+provides an implementation of the HAL interfaces in ``src/hal``.
+<<<
+RATIONALE: >>>
+The product line uses more than one MCU vendor. A port must only touch the HAL
+port and the board support package.
+<<<
+
+[REQUIREMENT]
+UID: SYS-007
+TITLE: Deterministic behavior
+STATEMENT: >>>
+The control loop shall run at a fixed period of 1 ms, and shall produce the
+same outputs for the same inputs on every target.
+<<<
+RATIONALE: >>>
+Floating-point rounding, heap allocation and unbounded loops make timing and
+results differ between targets and between runs.
+<<<
+
+[REQUIREMENT]
+UID: SYS-008
+TITLE: Host testability
+STATEMENT: >>>
+All logic above the HAL port shall be testable on a development host without
+target hardware.
+<<<
+
+[[/SECTION]]

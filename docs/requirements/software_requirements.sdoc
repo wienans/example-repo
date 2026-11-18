@@ -1,0 +1,332 @@
+[DOCUMENT]
+TITLE: Software requirements
+UID: DOC-SWR
+OPTIONS:
+  VIEW_STYLE: Table
+
+[[SECTION]]
+TITLE: Conventions
+
+[TEXT]
+STATEMENT: >>>
+Each requirement names the module that implements it. Code and tests point back
+at a requirement with a marker inside their Doxygen comment, in the form
+``@relation(SWR-PI-001, scope=function)``. ``make docs`` fails when a marker
+names a UID that this document does not define. ``make trace`` fails when a
+requirement has no test.
+
+Units: speed in rpm (``rpm_t``), current in mA (``milliamp_t``), and duty in
+permille from -1000 to 1000 (``duty_permille_t``). The sign of the duty sets
+the direction of rotation.
+<<<
+
+[[/SECTION]]
+
+[[SECTION]]
+TITLE: Domain: PI controller
+
+[REQUIREMENT]
+UID: SWR-PI-001
+TITLE: Proportional-integral output
+STATEMENT: >>>
+``pi_step`` shall return ``Kp * e + I``, clamped to ``[out_min, out_max]``,
+where ``e`` is the speed error and ``I`` is the accumulated integral term
+``sum(Ki * e)``. Gains are Q8 fixed-point integers, so a gain of 256 is 1.0.
+<<<
+RELATIONS:
+- TYPE: Parent
+  VALUE: SYS-001
+- TYPE: Parent
+  VALUE: SYS-007
+
+[REQUIREMENT]
+UID: SWR-PI-002
+TITLE: Integrator anti-windup
+STATEMENT: >>>
+The integral term shall stay within the output limits, and shall not grow
+further while the output is saturated in the direction of the error.
+<<<
+RATIONALE: >>>
+Without this, a long saturation stores a large integral that overshoots the
+setpoint when the load releases.
+<<<
+RELATIONS:
+- TYPE: Parent
+  VALUE: SYS-001
+
+[REQUIREMENT]
+UID: SWR-PI-003
+TITLE: Controller reset
+STATEMENT: >>>
+``pi_reset`` shall set the integral term to zero.
+<<<
+RELATIONS:
+- TYPE: Parent
+  VALUE: SYS-001
+
+[[/SECTION]]
+
+[[SECTION]]
+TITLE: Domain: motor state machine
+
+[REQUIREMENT]
+UID: SWR-FSM-001
+TITLE: Motor states
+STATEMENT: >>>
+The motor state machine shall have the states ``IDLE``, ``RUNNING`` and
+``FAULT``, and shall start in ``IDLE``.
+<<<
+RELATIONS:
+- TYPE: Parent
+  VALUE: SYS-002
+
+[REQUIREMENT]
+UID: SWR-FSM-002
+TITLE: Start and stop transitions
+STATEMENT: >>>
+The ``START`` event shall move ``IDLE`` to ``RUNNING``. The ``STOP`` event
+shall move ``RUNNING`` to ``IDLE``. Any other event in those states shall leave
+the state unchanged, except ``FAULT``.
+<<<
+RELATIONS:
+- TYPE: Parent
+  VALUE: SYS-002
+
+[REQUIREMENT]
+UID: SWR-FSM-003
+TITLE: Fault entry and acknowledge
+STATEMENT: >>>
+The ``FAULT`` event shall move every state to ``FAULT``. In ``FAULT``, only
+``CLEAR_FAULT`` shall change the state, and it shall move to ``IDLE``.
+<<<
+RELATIONS:
+- TYPE: Parent
+  VALUE: SYS-005
+
+[[/SECTION]]
+
+[[SECTION]]
+TITLE: Domain: fault monitor
+
+[REQUIREMENT]
+UID: SWR-FLT-001
+TITLE: Overcurrent detection
+STATEMENT: >>>
+``fault_monitor_step`` shall report ``FAULT_OVERCURRENT`` in the same call in
+which the absolute motor current exceeds ``overcurrent_ma``.
+<<<
+RELATIONS:
+- TYPE: Parent
+  VALUE: SYS-003
+
+[REQUIREMENT]
+UID: SWR-FLT-002
+TITLE: Stall detection
+STATEMENT: >>>
+``fault_monitor_step`` shall report ``FAULT_STALL`` when, for ``stall_ticks``
+consecutive calls, the absolute duty is at least ``stall_min_duty`` and the
+absolute speed is below ``stall_max_speed_rpm``. A call that breaks either
+condition shall restart the count.
+<<<
+RELATIONS:
+- TYPE: Parent
+  VALUE: SYS-004
+
+[[/SECTION]]
+
+[[SECTION]]
+TITLE: Domain: motor control
+
+[REQUIREMENT]
+UID: SWR-CTL-001
+TITLE: Setpoint clamp and ramp
+STATEMENT: >>>
+``motor_control_set_speed`` shall clamp the target to
+``[-max_setpoint_rpm, max_setpoint_rpm]``. Each ``motor_control_step`` call
+shall move the ramped setpoint toward the target by at most
+``ramp_rpm_per_tick``.
+<<<
+RELATIONS:
+- TYPE: Parent
+  VALUE: SYS-001
+
+[REQUIREMENT]
+UID: SWR-CTL-002
+TITLE: Drive disabled outside RUNNING
+STATEMENT: >>>
+In every state other than ``RUNNING``, ``motor_control_step`` shall return a
+drive command with ``enable = false`` and ``duty = 0``.
+<<<
+RELATIONS:
+- TYPE: Parent
+  VALUE: SYS-002
+- TYPE: Parent
+  VALUE: SYS-005
+
+[REQUIREMENT]
+UID: SWR-CTL-003
+TITLE: Bumpless start
+STATEMENT: >>>
+On entering ``RUNNING``, the controller shall reset the PI controller and start
+the ramped setpoint at the measured speed.
+<<<
+RATIONALE: >>>
+Starting the ramp at the measured speed avoids a step in duty when the operator
+restarts a motor that is still coasting.
+<<<
+RELATIONS:
+- TYPE: Parent
+  VALUE: SYS-001
+
+[REQUIREMENT]
+UID: SWR-CTL-004
+TITLE: Same-step fault shutdown
+STATEMENT: >>>
+When the fault monitor reports a fault, ``motor_control_step`` shall latch the
+fault flags, move the state machine to ``FAULT``, and return a disabled drive
+command in that same call. ``CLEAR_FAULT`` shall clear the latched flags.
+<<<
+RELATIONS:
+- TYPE: Parent
+  VALUE: SYS-003
+- TYPE: Parent
+  VALUE: SYS-004
+- TYPE: Parent
+  VALUE: SYS-005
+
+[[/SECTION]]
+
+[[SECTION]]
+TITLE: Middleware: scheduler
+
+[REQUIREMENT]
+UID: SWR-SCH-001
+TITLE: Fixed-period cooperative scheduling
+STATEMENT: >>>
+``sched_run`` shall call each task whose period has elapsed since its last run,
+in table order, once per call. It shall keep the period correct when the
+millisecond tick wraps around ``UINT32_MAX``.
+<<<
+RELATIONS:
+- TYPE: Parent
+  VALUE: SYS-007
+
+[[/SECTION]]
+
+[[SECTION]]
+TITLE: Board support package
+
+[REQUIREMENT]
+UID: SWR-BSP-001
+TITLE: Encoder speed conversion
+STATEMENT: >>>
+``bsp_motor_sample`` shall compute the speed from the change of the 16-bit
+encoder count since the previous sample, the board's counts per revolution and
+the 1 ms sample period. The result shall be correct when the counter wraps.
+<<<
+RELATIONS:
+- TYPE: Parent
+  VALUE: SYS-001
+- TYPE: Parent
+  VALUE: SYS-006
+
+[REQUIREMENT]
+UID: SWR-BSP-002
+TITLE: Current conversion
+STATEMENT: >>>
+``bsp_motor_sample`` shall convert the raw ADC reading of the current-sense
+channel to mA with the board's scale and offset.
+<<<
+RELATIONS:
+- TYPE: Parent
+  VALUE: SYS-003
+- TYPE: Parent
+  VALUE: SYS-006
+
+[REQUIREMENT]
+UID: SWR-BSP-003
+TITLE: Drive command mapping
+STATEMENT: >>>
+``bsp_motor_apply`` shall set the direction pin from the sign of the duty, set
+the PWM duty to the absolute duty, and set the bridge enable pin from
+``enable``.
+<<<
+RELATIONS:
+- TYPE: Parent
+  VALUE: SYS-006
+
+[REQUIREMENT]
+UID: SWR-BSP-004
+TITLE: Checked initialisation
+STATEMENT: >>>
+``bsp_init`` shall check the status of every HAL initialisation call and return
+``false`` if any call fails.
+<<<
+RELATIONS:
+- TYPE: Parent
+  VALUE: SYS-006
+
+[[/SECTION]]
+
+[[SECTION]]
+TITLE: Application
+
+[REQUIREMENT]
+UID: SWR-APP-001
+TITLE: Task periods
+STATEMENT: >>>
+The application shall run the control task every 1 ms and the user interface
+task every 10 ms.
+<<<
+RELATIONS:
+- TYPE: Parent
+  VALUE: SYS-007
+
+[REQUIREMENT]
+UID: SWR-APP-002
+TITLE: Button events
+STATEMENT: >>>
+A rising edge of the start button shall send ``START``. A rising edge of the
+stop button shall send ``CLEAR_FAULT`` in ``FAULT`` and ``STOP`` in every other
+state.
+<<<
+RELATIONS:
+- TYPE: Parent
+  VALUE: SYS-002
+- TYPE: Parent
+  VALUE: SYS-005
+
+[[/SECTION]]
+
+[[SECTION]]
+TITLE: Architecture constraints
+
+[REQUIREMENT]
+UID: SWR-ARC-001
+TITLE: Layer include rule
+STATEMENT: >>>
+Source files shall include only headers from the layers they may depend on:
+``app`` on ``app``, ``domain``, ``middleware`` and ``bsp``. ``domain`` on
+``domain``. ``middleware`` on ``middleware``. ``bsp`` on ``bsp``, ``hal`` and
+``domain``. ``hal`` on ``hal``. Only ``src/hal/port`` may include vendor
+headers. ``tools/check_layers.py`` enforces this rule.
+<<<
+RELATIONS:
+- TYPE: Parent
+  VALUE: SYS-006
+- TYPE: Parent
+  VALUE: SYS-008
+
+[REQUIREMENT]
+UID: SWR-DET-001
+TITLE: No heap and no floating point
+STATEMENT: >>>
+Source files outside ``src/hal/port`` shall not call ``malloc``, ``calloc``,
+``realloc`` or ``free``, and shall not use ``float`` or ``double``.
+``tools/check_layers.py`` enforces this rule.
+<<<
+RELATIONS:
+- TYPE: Parent
+  VALUE: SYS-007
+
+[[/SECTION]]
