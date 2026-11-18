@@ -1,23 +1,33 @@
 # System context
 
-The firmware holds a brushed DC motor at a commanded speed. It reads the shaft speed from a quadrature encoder and the winding current from a shunt resistor, and it drives the motor through an H-bridge. An operator starts and stops the motor with two buttons. The firmware trips to a safe state on overcurrent or stall.
+The firmware holds a brushed DC motor at a commanded speed. It reads the shaft speed from a quadrature encoder and the winding current from a shunt resistor, and it drives the motor through an H-bridge. An operator starts and stops the motor with two buttons. The firmware switches the drive off on overcurrent or stall.
+
+This overview diagram is for a reader new to the project. It shows the firmware as one box and everything it exchanges signals with. Arrows point the way each signal travels.
 
 ```mermaid
-C4Context
-  title System context: motor control firmware
+flowchart LR
+  accTitle: System context of the motor control firmware
+  accDescr: The operator presses start and stop buttons wired to the firmware. The firmware sets PWM duty, direction and enable on the power stage, and reads winding current back from it over the ADC. The quadrature encoder reports shaft position to the firmware through a timer.
+  classDef person fill:#FFE4B5,stroke:#FF8C00,stroke-width:2px,color:black
+  classDef firmware fill:#90EE90,stroke:#2E7D2E,stroke-width:2px,color:darkgreen
+  classDef hardware fill:#F0F0F0,stroke:#333333,stroke-width:2px,color:black
 
-  Person(operator, "Operator", "Starts, stops and acknowledges faults")
-  System(fw, "Motor control firmware", "Closed-loop speed control with overcurrent and stall protection")
-  System_Ext(bridge, "Power stage", "H-bridge, brushed DC motor, current shunt")
-  System_Ext(encoder, "Quadrature encoder", "Mounted on the motor shaft")
+  operator["👤 Operator<br/>[Person]<br/>Starts, stops and acknowledges faults"]
+  fw["⚙️ Motor control firmware<br/>[Software system: C99]<br/>Holds the set speed and trips on faults"]
+  bridge["🔩 Power stage<br/>[Hardware]<br/>H-bridge, DC motor, current shunt"]
+  encoder["🔩 Quadrature encoder<br/>[Hardware]<br/>Mounted on the motor shaft"]
 
-  Rel(operator, fw, "Presses start and stop", "GPIO")
-  Rel(fw, bridge, "Sets duty, direction and enable", "PWM and GPIO")
-  Rel(bridge, fw, "Reports winding current", "ADC")
-  Rel(encoder, fw, "Reports shaft position", "Timer in encoder mode")
+  operator -->|"Start and stop buttons<br/>GPIO, active low"| fw
+  fw -->|"Duty, direction, enable<br/>PWM and GPIO"| bridge
+  bridge -->|"Winding current<br/>ADC"| fw
+  encoder -->|"Shaft position<br/>Timer in encoder mode"| fw
 
-  UpdateLayoutConfig($c4ShapeInRow="2", $c4BoundaryInRow="1")
+  class operator person
+  class fw firmware
+  class bridge,encoder hardware
 ```
+
+The symbols and colors follow [Diagram conventions](00_diagram_conventions.md).
 
 ## What the system promises
 
