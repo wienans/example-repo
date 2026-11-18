@@ -1,0 +1,63 @@
+---
+:project:
+  :which_ceedling: gem
+  :ceedling_version: '?'
+  :use_mocks: TRUE
+  :use_test_preprocessor: :all
+  :build_root: build/ceedling
+  :test_file_prefix: test_
+  :default_tasks:
+    - test:all
+
+:plugins:
+  :enabled:
+    - report_tests_pretty_stdout
+
+:paths:
+  :test:
+    - +:tests/unit/**
+  :source:
+    - +:src/app
+    - +:src/domain
+    - +:src/middleware
+    - +:src/bsp
+    - +:src/hal
+  :include:
+    - +:src/app
+    - +:src/domain
+    - +:src/middleware
+    - +:src/bsp
+    - +:src/hal
+  :support: []
+
+:files:
+  :source:
+    - -:src/app/main.c
+
+:cmock:
+  :mock_prefix: mock_
+  :when_no_prototypes: :warn
+  :enforce_strict_ordering: FALSE
+  :plugins:
+    - :ignore
+    - :ignore_arg
+    - :expect_any_args
+    - :callback
+  :treat_as:
+    rpm_t: INT32
+    milliamp_t: INT32
+    duty_permille_t: INT16
+    hal_gpio_pin_t: UINT8
+    hal_pwm_channel_t: UINT8
+    hal_encoder_id_t: UINT8
+    hal_adc_channel_t: UINT8
+
+:flags:
+  :test:
+    :compile:
+      :*:
+        - -std=c99
+        - -Wall
+        - -Wextra
+        - -Werror
+...
