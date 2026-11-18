@@ -1,0 +1,34 @@
+# Doxygen configuration. Run from the repo root: doxygen docs/Doxyfile
+# Only settings that differ from the Doxygen defaults are listed.
+
+PROJECT_NAME           = "Motor control example"
+PROJECT_BRIEF          = "Portable DC motor speed control firmware"
+OUTPUT_DIRECTORY       = build/doxygen
+
+INPUT                  = README.md src
+USE_MDFILE_AS_MAINPAGE = README.md
+FILE_PATTERNS          = *.h *.c *.md
+RECURSIVE              = YES
+
+OPTIMIZE_OUTPUT_FOR_C  = YES
+EXTRACT_ALL            = NO
+EXTRACT_STATIC         = YES
+JAVADOC_AUTOBRIEF      = YES
+SOURCE_BROWSER         = YES
+STRIP_FROM_PATH        = .
+FULL_PATH_NAMES        = YES
+
+# StrictDoc relation markers, e.g. @relation(SWR-PI-001, scope=function),
+# render as a "Requirement" paragraph instead of an unknown-command warning.
+ALIASES                = "relation=@par Requirement^^"
+
+GENERATE_HTML          = YES
+GENERATE_LATEX         = NO
+HAVE_DOT               = YES
+CALL_GRAPH             = NO
+INCLUDE_GRAPH          = YES
+
+WARN_IF_UNDOCUMENTED   = YES
+WARN_NO_PARAMDOC       = YES
+WARN_AS_ERROR          = FAIL_ON_WARNINGS
+QUIET                  = YES
