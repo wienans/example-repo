@@ -6,6 +6,10 @@
 #ifndef PI_CONTROLLER_H
 #define PI_CONTROLLER_H
 
+/** @addtogroup domain
+ * @{
+ */
+
 #include <stdint.h>
 
 /**
@@ -49,4 +53,5 @@ void pi_reset(pi_controller_t *pi);
  */
 int32_t pi_step(pi_controller_t *pi, int32_t error);
 
+/** @} */
 #endif

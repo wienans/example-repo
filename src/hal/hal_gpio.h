@@ -6,6 +6,10 @@
 #ifndef HAL_GPIO_H
 #define HAL_GPIO_H
 
+/** @addtogroup hal
+ * @{
+ */
+
 #include <stdbool.h>
 #include <stdint.h>
 #include "hal_types.h"
@@ -41,4 +45,5 @@ void hal_gpio_write(hal_gpio_pin_t pin, bool level);
  */
 bool hal_gpio_read(hal_gpio_pin_t pin);
 
+/** @} */
 #endif

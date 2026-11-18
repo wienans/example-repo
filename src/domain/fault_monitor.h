@@ -6,6 +6,10 @@
 #ifndef FAULT_MONITOR_H
 #define FAULT_MONITOR_H
 
+/** @addtogroup domain
+ * @{
+ */
+
 #include <stdint.h>
 
 #include "motor_types.h"
@@ -56,4 +60,5 @@ void fault_monitor_reset(fault_monitor_t *fm);
  */
 fault_flags_t fault_monitor_step(fault_monitor_t *fm, const motor_sample_t *sample, duty_permille_t applied_duty);
 
+/** @} */
 #endif

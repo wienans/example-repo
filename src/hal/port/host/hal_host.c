@@ -1,3 +1,8 @@
+/**
+ * @file hal_host.c
+ * @brief HAL implementation for the host simulation.
+ * @ingroup hal
+ */
 #include <math.h>
 #include <stdbool.h>
 #include <stdint.h>
@@ -11,12 +16,18 @@
 #include "host_plant.h"
 #include "host_scenario.h"
 
+/** @brief H-bridge supply voltage. */
 #define HOST_SUPPLY_V 24.0
+/** @brief Number of simulated GPIO pins. */
 #define HOST_GPIO_PINS 8u
 
+/** @brief Simulated time. */
 static uint32_t s_now_ms;
+/** @brief Latched output level per pin. */
 static bool s_gpio_out[HOST_GPIO_PINS];
+/** @brief Duty on the motor PWM channel. */
 static uint16_t s_duty_permille;
+/** @brief Motor model. */
 static host_plant_t s_plant;
 
 /**

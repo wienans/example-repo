@@ -6,6 +6,10 @@
 #ifndef BSP_CONVERT_H
 #define BSP_CONVERT_H
 
+/** @addtogroup bsp
+ * @{
+ */
+
 #include <stdint.h>
 
 #include "motor_types.h"
@@ -32,4 +36,5 @@ rpm_t bsp_counts_to_rpm(int32_t delta_counts);
  */
 milliamp_t bsp_adc_to_ma(uint16_t raw);
 
+/** @} */
 #endif

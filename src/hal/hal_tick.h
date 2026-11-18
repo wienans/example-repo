@@ -6,6 +6,10 @@
 #ifndef HAL_TICK_H
 #define HAL_TICK_H
 
+/** @addtogroup hal
+ * @{
+ */
+
 #include <stdint.h>
 #include "hal_types.h"
 
@@ -21,4 +25,5 @@ hal_status_t hal_tick_init(void);
  */
 uint32_t hal_tick_ms(void);
 
+/** @} */
 #endif

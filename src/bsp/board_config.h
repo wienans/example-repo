@@ -6,6 +6,10 @@
 #ifndef BOARD_CONFIG_H
 #define BOARD_CONFIG_H
 
+/** @addtogroup bsp
+ * @{
+ */
+
 #include "hal_adc.h"
 #include "hal_encoder.h"
 #include "hal_gpio.h"
@@ -46,4 +50,5 @@
 /** @brief Denominator of the ADC current scale. */
 #define BOARD_ADC_MA_PER_COUNT_DEN 4096
 
+/** @} */
 #endif

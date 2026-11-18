@@ -6,6 +6,10 @@
 #ifndef HAL_ENCODER_H
 #define HAL_ENCODER_H
 
+/** @addtogroup hal
+ * @{
+ */
+
 #include <stdint.h>
 #include "hal_types.h"
 
@@ -27,4 +31,5 @@ hal_status_t hal_encoder_init(hal_encoder_id_t encoder);
  */
 uint16_t hal_encoder_count(hal_encoder_id_t encoder);
 
+/** @} */
 #endif

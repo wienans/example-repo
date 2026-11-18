@@ -6,6 +6,10 @@
 #ifndef HAL_ADC_H
 #define HAL_ADC_H
 
+/** @addtogroup hal
+ * @{
+ */
+
 #include <stdint.h>
 #include "hal_types.h"
 
@@ -26,4 +30,5 @@ hal_status_t hal_adc_init(hal_adc_channel_t channel);
  */
 uint16_t hal_adc_read(hal_adc_channel_t channel);
 
+/** @} */
 #endif

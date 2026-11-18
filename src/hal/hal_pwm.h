@@ -6,6 +6,10 @@
 #ifndef HAL_PWM_H
 #define HAL_PWM_H
 
+/** @addtogroup hal
+ * @{
+ */
+
 #include <stdint.h>
 #include "hal_types.h"
 
@@ -27,4 +31,5 @@ hal_status_t hal_pwm_init(hal_pwm_channel_t channel, uint32_t freq_hz);
  */
 void hal_pwm_set_duty(hal_pwm_channel_t channel, uint16_t duty_permille);
 
+/** @} */
 #endif

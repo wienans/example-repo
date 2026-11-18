@@ -6,6 +6,10 @@
 #ifndef MOTOR_CONTROL_H
 #define MOTOR_CONTROL_H
 
+/** @addtogroup domain
+ * @{
+ */
+
 #include "fault_monitor.h"
 #include "motor_fsm.h"
 #include "motor_types.h"
@@ -87,4 +91,5 @@ fault_flags_t motor_control_faults(const motor_control_t *mc);
  */
 rpm_t motor_control_setpoint(const motor_control_t *mc);
 
+/** @} */
 #endif

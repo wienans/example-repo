@@ -6,6 +6,10 @@
 #ifndef APP_CONFIG_H
 #define APP_CONFIG_H
 
+/** @addtogroup app
+ * @{
+ */
+
 #include "bsp.h"
 
 /** @brief Speed requested at start-up. */
@@ -36,4 +40,5 @@
 /** @brief Button task period. */
 #define APP_UI_PERIOD_MS 10
 
+/** @} */
 #endif

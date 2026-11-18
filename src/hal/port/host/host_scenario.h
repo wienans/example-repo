@@ -6,6 +6,10 @@
 #ifndef HOST_SCENARIO_H
 #define HOST_SCENARIO_H
 
+/** @addtogroup hal
+ * @{
+ */
+
 #include <stdbool.h>
 #include <stdint.h>
 
@@ -36,4 +40,5 @@ bool host_scenario_stop_pressed(uint32_t now_ms);
  */
 bool host_scenario_rotor_locked(uint32_t now_ms);
 
+/** @} */
 #endif

@@ -6,6 +6,10 @@
 #ifndef MOTOR_FSM_H
 #define MOTOR_FSM_H
 
+/** @addtogroup domain
+ * @{
+ */
+
 /** @brief Operating mode. */
 typedef enum {
     MOTOR_STATE_IDLE = 0, /**< Drive disabled, ready to start. Initial state. */
@@ -34,4 +38,5 @@ typedef enum {
  */
 motor_state_t motor_fsm_next(motor_state_t state, motor_event_t event);
 
+/** @} */
 #endif

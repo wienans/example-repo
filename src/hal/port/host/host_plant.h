@@ -6,6 +6,10 @@
 #ifndef HOST_PLANT_H
 #define HOST_PLANT_H
 
+/** @addtogroup hal
+ * @{
+ */
+
 #include <stdbool.h>
 
 /** @brief Motor state integrated by host_plant_step(). */
@@ -25,4 +29,5 @@ typedef struct {
  */
 void host_plant_step(host_plant_t *plant, double voltage_v, bool driven, double dt_s);
 
+/** @} */
 #endif
