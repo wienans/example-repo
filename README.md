@@ -13,9 +13,9 @@ Example firmware for closed-loop speed control of a brushed DC motor. It holds t
 | `src/hal/` | HAL interface headers. `src/hal/port/<mcu>/` holds one implementation per MCU |
 | `tests/unit/` | Ceedling unit tests, one directory per layer |
 | `docs/requirements/` | System and software requirements in StrictDoc `.sdoc` |
-| `docs/architecture/` | C4 context, container and component views, layering, runtime, porting guide |
+| `docs/architecture/` | Diagram conventions, C4 context, container and component views, layering, runtime, porting guide |
 | `docs/adr/` | Architecture decision records |
-| `tools/` | `check_layers.py` and `check_trace.py`, the checks behind `make lint` and `make trace` |
+| `tools/` | `check_layers.py`, `check_trace.py` and `check_diagrams.py`, the checks behind `make lint`, `make trace` and `make diagrams` |
 
 ## Prerequisites
 
@@ -24,6 +24,7 @@ Example firmware for closed-loop speed control of a brushed DC motor. It holds t
 - Python 3.10 or later
 - StrictDoc: `pip install strictdoc`
 - Doxygen 1.9 or later and Graphviz
+- Node.js and Mermaid CLI: `npm install -g @mermaid-js/mermaid-cli`. Set `PUPPETEER_EXECUTABLE_PATH` if Chromium is not where Puppeteer expects it
 
 ## Build and check
 
@@ -35,7 +36,8 @@ Run each check from the repo root.
 | `make test` | Builds and runs every Ceedling unit test |
 | `make trace` | Fails if a software requirement has no test or check that names it |
 | `make sim` | Builds the firmware with the host HAL port, runs a 2.5 s scenario, writes `build/sim/telemetry.csv` |
-| `make docs` | Builds the Doxygen API reference and the StrictDoc site, and fails on a broken requirement link |
+| `make diagrams` | Checks every Mermaid diagram in `docs/` against `docs/architecture/00_diagram_conventions.md` and renders it to `build/diagrams/` |
+| `make docs` | Runs `make diagrams`, then builds the Doxygen API reference and the StrictDoc site, and fails on a broken requirement link |
 | `make all` | Runs `lint`, `test`, `trace` and `sim` |
 
 Open `build/strictdoc/html/index.html` for requirements, architecture and ADRs. Open `build/doxygen/html/index.html` for the API reference.

@@ -3,6 +3,8 @@ PYTHON    ?= python3
 CEEDLING  ?= ceedling
 DOXYGEN   ?= doxygen
 STRICTDOC ?= $(if $(wildcard /opt/sdvenv/bin/strictdoc),/opt/sdvenv/bin/strictdoc,strictdoc)
+PUPPETEER_EXECUTABLE_PATH ?= $(shell command -v chromium 2>/dev/null)
+export PUPPETEER_EXECUTABLE_PATH
 
 SIM_DIR   := build/sim
 SIM_BIN   := $(SIM_DIR)/motor_sim
@@ -11,7 +13,7 @@ SIM_DIRS  := src/app src/domain src/middleware src/bsp src/hal src/hal/port/host
 SIM_SRCS  := $(foreach d,$(SIM_DIRS),$(wildcard $(d)/*.c))
 SIM_FLAGS := -std=c99 -Wall -Wextra -Wconversion -Werror -O2 $(addprefix -I,$(SIM_DIRS))
 
-.PHONY: all lint test trace sim docs clean
+.PHONY: all lint test trace sim diagrams docs clean
 
 all: lint test trace sim
 
@@ -32,7 +34,10 @@ sim: $(SIM_BIN)
 	$(SIM_BIN) > $(SIM_CSV)
 	@echo "telemetry: $(SIM_CSV) ($$(wc -l < $(SIM_CSV)) lines)"
 
-docs:
+diagrams:
+	python3 tools/check_diagrams.py
+
+docs: diagrams
 	$(DOXYGEN) docs/Doxyfile && $(STRICTDOC) export . --output-dir build/strictdoc
 
 clean:

@@ -1,0 +1,5 @@
+{
+  "theme": "default",
+  "securityLevel": "strict",
+  "flowchart": { "htmlLabels": true, "curve": "basis" }
+}
