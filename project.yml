@@ -17,17 +17,11 @@
   :test:
     - +:tests/unit/**
   :source:
-    - +:src/app
-    - +:src/domain
-    - +:src/middleware
-    - +:src/bsp
-    - +:src/hal
+    - +:src/**
+    - -:src/hal/port/**
   :include:
-    - +:src/app
-    - +:src/domain
-    - +:src/middleware
-    - +:src/bsp
-    - +:src/hal
+    - +:src/**
+    - -:src/hal/port/**
   :support: []
 
 :files:
