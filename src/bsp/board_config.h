@@ -31,8 +31,6 @@
 #define BOARD_ENCODER_MOTOR ((hal_encoder_id_t)0)
 /** @brief Quadrature counts per shaft revolution (4096 lines x 4 edges). */
 #define BOARD_ENCODER_CPR 16384
-/** @brief Period between two encoder samples in ms (the control tick). */
-#define BOARD_SAMPLE_PERIOD_MS 1
 
 /** @brief ADC channel of the bidirectional current-sense amplifier. */
 #define BOARD_ADC_CH_MOTOR_CURRENT ((hal_adc_channel_t)0)
