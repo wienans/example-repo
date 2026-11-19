@@ -34,7 +34,7 @@ Run each check from the repo root.
 | --- | --- |
 | `make lint` | Fails if a file includes a header from a layer it may not depend on, or uses heap or floating point above the HAL port |
 | `make test` | Builds and runs every Ceedling unit test |
-| `make trace` | Fails if a software requirement has no test or check that names it, or no code that implements it, or if a marker has the wrong role for its directory |
+| `make trace` | Runs `make test`, then fails if a software requirement has no passing test or check that names it, or no code that implements it, or if a marker has the wrong role for its directory |
 | `make sim` | Builds the firmware with the host HAL port, runs a 2.5 s scenario, writes `build/sim/telemetry.csv` |
 | `make diagrams` | Checks every Mermaid diagram in `docs/` against `docs/architecture/00_diagram_conventions.md` and renders it to `build/diagrams/` |
 | `make docs` | Runs `make diagrams`, then builds the Doxygen API reference and the StrictDoc site, and fails on a broken requirement link |
@@ -55,7 +55,7 @@ Each function that implements a requirement, and each test that checks one, name
 	 * @relation(SWR-PI-001, scope=function, role=Implementation)
 	 */
 
-The role says what the marker is evidence of: `role=Implementation` in `src/`, `role=Test` in `tests/`, and `role=Check` for the static checks in `tools/`. StrictDoc reads these markers and links each requirement to its code and tests, tagged with the role. `make docs` fails when a marker or a `[LINK: UID]` tag in a Markdown page names an unknown requirement. `make trace` fails when a requirement has no test or no implementation. `docs/adr/0006-documentation-toolchain.md` explains the setup.
+The role says what the marker is evidence of: `role=Implementation` in `src/`, `role=Test` in `tests/`, and `role=Check` for the static checks in `tools/`. StrictDoc reads these markers and links each requirement to its code and tests, tagged with the role. `make docs` fails when a marker or a `[LINK: UID]` tag in a Markdown page names an unknown requirement. `make trace` fails when a requirement has no implementation, or when none of its tests passed in the last run. It reads the results from the JUnit report Ceedling writes to `build/ceedling/artifacts/test/junit_tests_report.xml`, so a failing or ignored test is not evidence. `docs/adr/0006-documentation-toolchain.md` explains the setup.
 
 ## Port to a new MCU
 

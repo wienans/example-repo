@@ -7,11 +7,18 @@ Code and tests name a requirement with a StrictDoc marker that carries a role:
 - ``role=Test`` in ``tests/``: the unit test verifies it.
 - ``role=Check`` in ``tools/``: a static check verifies it over the whole tree.
 
+A ``Test`` marker counts as evidence only if the test function right below it
+passed in the last Ceedling run. The script reads that result from the JUnit
+report that Ceedling's ``report_tests_log_factory`` plugin writes, so run
+``make test`` first. ``make trace`` does that.
+
 StrictDoc already rejects markers that name an unknown UID, so this script
 checks the other direction. It fails when:
 
 - a marker under one of those directories lacks the role that directory needs,
-- a software requirement has no ``Test`` or ``Check`` marker,
+- a ``Test`` marker does not sit on a ``test_*`` function,
+- the JUnit report is missing, or older than a file under ``src/`` or ``tests/``,
+- a software requirement has no passing ``Test`` and no ``Check``,
 - a software requirement has no ``Implementation`` marker. A requirement that a
   ``Check`` verifies is exempt, because it constrains every source file rather
   than naming one,
@@ -23,9 +30,11 @@ marker of its own. A marker here would count as evidence for a requirement it
 does not verify.
 """
 
+import dataclasses
 import pathlib
 import re
 import sys
+import xml.etree.ElementTree as ET
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 # PARENT includes one file per domain from REQUIREMENTS_DIR.
@@ -37,12 +46,29 @@ ROLE_BY_DIR = {
     ROOT / "tests": "Test",
     ROOT / "tools": "Check",
 }
-VERIFYING_ROLES = {"Test", "Check"}
 MARKED_SUFFIXES = {".c", ".h", ".py"}
+JUNIT_REPORT = ROOT / "build" / "ceedling" / "artifacts" / "test" / "junit_tests_report.xml"
+# A report older than any of these files does not describe the current code.
+REPORT_INPUTS = [ROOT / "src", ROOT / "tests", ROOT / "project.yml"]
 
 UID_LINE = re.compile(r"^UID:\s*(SWR-[A-Z]+-\d+)\s*$", re.MULTILINE)
 RELATION = re.compile(r"@relation\(([^)]*)\)")
 INCLUDE = re.compile(r"^\[DOCUMENT_FROM_FILE\]\nFILE:\s*(\S+)\s*$", re.MULTILINE)
+# The rest of the comment that holds the marker, then the test function it documents.
+TEST_FUNCTION_AFTER_MARKER = re.compile(r"[^\n]*\n(?:[ \t]*\*[^/\n][^\n]*\n|[ \t]*\*\n)*[ \t]*\*/\s*\nvoid\s+(test_\w+)\s*\(")
+
+
+@dataclasses.dataclass
+class Marker:
+    path: pathlib.Path
+    line: int
+    role: str
+    uids: list[str]
+    test: str | None = None  # the test function a Test marker documents
+
+    @property
+    def where(self) -> str:
+        return f"{self.path.relative_to(ROOT)}:{self.line}"
 
 
 def unincluded_files() -> list[pathlib.Path]:
@@ -62,9 +88,9 @@ def defined_uids() -> dict[str, pathlib.Path]:
     return found
 
 
-def collect_markers() -> tuple[dict[str, set[str]], list[str]]:
-    """Map each role to the UIDs it names, and list markers with the wrong role."""
-    by_role: dict[str, set[str]] = {}
+def collect_markers() -> tuple[list[Marker], list[str]]:
+    """Every marker that names a software requirement, and the markers that are malformed."""
+    markers: list[Marker] = []
     errors: list[str] = []
     for directory, expected in ROLE_BY_DIR.items():
         for path in sorted(directory.rglob("*")):
@@ -77,16 +103,46 @@ def collect_markers() -> tuple[dict[str, set[str]], list[str]]:
                 if not uids:
                     continue
                 roles = [a.removeprefix("role=") for a in args if a.startswith("role=")]
-                role = roles[0] if roles else None
-                if role != expected:
-                    line = text.count("\n", 0, match.start()) + 1
-                    errors.append(
-                        f"{path.relative_to(ROOT)}:{line}: marker needs role={expected}, "
-                        f"has {'role=' + role if role else 'no role'}"
-                    )
+                marker = Marker(path, text.count("\n", 0, match.start()) + 1, roles[0] if roles else "", uids)
+                if marker.role != expected:
+                    has = f"role={marker.role}" if marker.role else "no role"
+                    errors.append(f"{marker.where}: marker needs role={expected}, has {has}")
                     continue
-                by_role.setdefault(role, set()).update(uids)
-    return by_role, errors
+                if marker.role == "Test":
+                    function = TEST_FUNCTION_AFTER_MARKER.match(text, match.end())
+                    if function is None:
+                        errors.append(f"{marker.where}: Test marker is not on a test_* function")
+                        continue
+                    marker.test = function.group(1)
+                markers.append(marker)
+    return markers, errors
+
+
+def newest_input() -> pathlib.Path:
+    files = [p for d in REPORT_INPUTS for p in ([d] if d.is_file() else d.rglob("*")) if p.is_file()]
+    return max(files, key=lambda p: p.stat().st_mtime)
+
+
+def read_test_results() -> tuple[dict[tuple[str, str], str], str | None]:
+    """Map (test file, test function) to passed, failed or skipped, or explain why not."""
+    if not JUNIT_REPORT.is_file():
+        return {}, f"{JUNIT_REPORT.relative_to(ROOT)}: missing, run make test first"
+    newest = newest_input()
+    if newest.stat().st_mtime > JUNIT_REPORT.stat().st_mtime:
+        return {}, (
+            f"{JUNIT_REPORT.relative_to(ROOT)}: older than {newest.relative_to(ROOT)}, "
+            "run make test first"
+        )
+    results: dict[tuple[str, str], str] = {}
+    for case in ET.parse(JUNIT_REPORT).iter("testcase"):
+        if case.find("failure") is not None or case.find("error") is not None:
+            outcome = "failed"
+        elif case.find("skipped") is not None:
+            outcome = "skipped"
+        else:
+            outcome = "passed"
+        results[(case.get("file", ""), case.get("name", ""))] = outcome
+    return results, None
 
 
 def main() -> int:
@@ -98,18 +154,43 @@ def main() -> int:
     for path in unincluded_files():
         problems.append(f"{path.relative_to(ROOT)}: not included by {PARENT.relative_to(ROOT)}")
 
-    by_role, role_errors = collect_markers()
-    problems.extend(role_errors)
+    markers, marker_errors = collect_markers()
+    problems.extend(marker_errors)
+    results, report_error = read_test_results()
+    if report_error:
+        problems.append(report_error)
 
-    verified = set().union(*(by_role.get(r, set()) for r in VERIFYING_ROLES))
-    implemented = by_role.get("Implementation", set()) | by_role.get("Check", set())
-    for uid in sorted(defined.keys() - verified):
-        problems.append(f"{defined[uid].relative_to(ROOT)}: {uid} has no test or check")
+    implemented: set[str] = set()
+    verified: set[str] = set()
+    # Why each test that names a requirement does not count, keyed by UID.
+    unproven: dict[str, list[str]] = {}
+    for marker in markers:
+        if marker.role in ("Implementation", "Check"):
+            implemented.update(marker.uids)
+        if marker.role == "Check":
+            verified.update(marker.uids)
+        if marker.role == "Test":
+            outcome = results.get((str(marker.path.relative_to(ROOT)), marker.test), "not run")
+            if outcome == "passed":
+                verified.update(marker.uids)
+            else:
+                for uid in marker.uids:
+                    unproven.setdefault(uid, []).append(f"{marker.test} {outcome}")
+
+    # Without a usable report every test reads "not run". The report error is the
+    # one cause, so it stands alone instead of one line per requirement.
+    if not report_error:
+        for uid in sorted(defined.keys() - verified):
+            why = f" ({', '.join(unproven[uid])})" if uid in unproven else ""
+            problems.append(f"{defined[uid].relative_to(ROOT)}: {uid} has no passing test or check{why}")
     for uid in sorted(defined.keys() - implemented):
         problems.append(f"{defined[uid].relative_to(ROOT)}: {uid} has no implementation")
 
     for line in problems:
         print(line)
+    if report_error:
+        print(f"check_trace: test evidence unknown, {len(defined.keys() & implemented)}/{len(defined)} implemented")
+        return 1
     print(
         f"check_trace: {len(defined.keys() & verified)}/{len(defined)} requirements verified, "
         f"{len(defined.keys() & implemented)}/{len(defined)} implemented"

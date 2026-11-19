@@ -20,7 +20,8 @@ all: lint test trace sim
 lint:
 	$(PYTHON) tools/check_layers.py
 
-trace:
+# check_trace reads the JUnit report that the test run writes.
+trace: test
 	$(PYTHON) tools/check_trace.py
 
 test:
