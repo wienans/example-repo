@@ -13,7 +13,7 @@ SIM_DIRS  := src/app src/domain src/middleware src/bsp src/hal src/hal/port/host
 SIM_SRCS  := $(foreach d,$(SIM_DIRS),$(wildcard $(d)/*.c))
 SIM_FLAGS := -std=c99 -Wall -Wextra -Wconversion -Werror -O2 $(addprefix -I,$(SIM_DIRS))
 
-.PHONY: all lint test trace sim diagrams docs release clean
+.PHONY: all lint test trace sim diagrams reports docs release clean
 
 all: lint test trace sim
 
@@ -38,7 +38,8 @@ sim: $(SIM_BIN)
 diagrams:
 	python3 tools/check_diagrams.py
 
-# make docs runs the unit tests once, under gcov, and publishes the results:
+# make reports runs the unit tests once, under gcov, and turns the results
+# into the Test results and Code coverage documents. make docs publishes them:
 # - A red test does not stop the site: the leading - lets make carry on and
 #   the result shows red. make trace is the gate that fails on it.
 # - The gcov build and its reports start from scratch. Leftover .gcda
@@ -54,11 +55,14 @@ diagrams:
 # - StrictDoc puts the documents under a folder named after the checkout.
 GENERATED_DOCS := docs/generated
 SITE_DOCS      := build/strictdoc/html/$(notdir $(CURDIR))/$(GENERATED_DOCS)
-docs: diagrams
-	rm -rf build/ceedling/gcov build/ceedling/artifacts/gcov build/strictdoc $(GENERATED_DOCS)/*.sdoc
+reports:
+	rm -rf build/ceedling/gcov build/ceedling/artifacts/gcov $(GENERATED_DOCS)/*.sdoc
 	-$(CEEDLING) gcov:all
 	$(PYTHON) tools/test_results_to_sdoc.py
 	$(PYTHON) tools/coverage_to_sdoc.py
+
+docs: diagrams reports
+	rm -rf build/strictdoc
 	$(DOXYGEN) docs/Doxyfile
 	$(STRICTDOC) export . --output-dir build/strictdoc
 	mkdir -p $(SITE_DOCS)/gcovr
@@ -67,15 +71,19 @@ docs: diagrams
 # make release VERSION=v1.2.3 [PREVIOUS=v1.2.2] [PUBLISH=0]
 # - make trace runs first, so a release never ships a requirement without a
 #   passing test.
-# - The generated Test results and Code coverage documents are removed, so
-#   the PDF holds only the committed documents.
+# - make reports regenerates the Test results and Code coverage documents,
+#   so the full PDF ends with them. They are git-ignored, so the changelog
+#   PDF, which compares two git tags, never lists them.
 # - tools/release.py tags HEAD, prints all documents into one PDF and the
 #   StrictDoc changelog since PREVIOUS (default: the latest tag) into a
 #   second, then pushes main and the tag and creates a GitHub release with
 #   both PDFs. PUBLISH=0 builds the PDFs into build/release/ and stops.
-release: trace
-	@test -n "$(VERSION)" || { echo "usage: make release VERSION=v1.2.3 [PREVIOUS=v1.2.2] [PUBLISH=0]"; exit 1; }
-	rm -f $(GENERATED_DOCS)/*.sdoc
+ifneq ($(filter release,$(MAKECMDGOALS)),)
+ifndef VERSION
+$(error usage: make release VERSION=v1.2.3 [PREVIOUS=v1.2.2] [PUBLISH=0])
+endif
+endif
+release: trace reports
 	STRICTDOC=$(STRICTDOC) $(PYTHON) tools/release.py $(VERSION) \
 		$(if $(PREVIOUS),--previous $(PREVIOUS)) $(if $(filter 0,$(PUBLISH)),--no-publish)
 

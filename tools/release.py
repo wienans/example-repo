@@ -201,7 +201,8 @@ def publish(version: str, previous: str, pdfs: list) -> None:
     run("git", "push", "origin", version)
     notes = (
         f"Documentation of {version}.\n\n"
-        f"- `{pdfs[0].name}`: every requirement, architecture page and ADR.\n"
+        f"- `{pdfs[0].name}`: every requirement, architecture page and ADR, "
+        "with the test results and code coverage of this version.\n"
         f"- `{pdfs[1].name}`: what changed since {previous}, from the "
         "StrictDoc Diff screen."
     )
