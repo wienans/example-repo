@@ -39,8 +39,11 @@ Run each check from the repo root.
 | `make diagrams` | Checks every Mermaid diagram in `docs/` against `docs/architecture/00_diagram_conventions.md` and renders it to `build/diagrams/` |
 | `make docs` | Runs `make diagrams`, runs the unit tests once with coverage, then builds the Doxygen API reference and the StrictDoc site with the Test results and Code coverage documents. Fails on a broken requirement link, not on a failing test, which shows red |
 | `make all` | Runs `lint`, `test`, `trace` and `sim` |
+| `make release VERSION=v1.2.3` | Runs `make trace`, tags HEAD, and builds two PDFs into `build/release/`: every StrictDoc document in one file, and the StrictDoc changelog since the previous tag. Then pushes `main` and the tag, and creates a GitHub release with both PDFs. `PREVIOUS=v1.2.0` picks the tag to compare with, `PUBLISH=0` stops after the PDFs and removes the tag |
 
 Open `build/strictdoc/html/index.html` for requirements, architecture, ADRs, test results and coverage. Open `build/doxygen/html/index.html` for the API reference.
+
+To edit requirements in the browser, run `strictdoc server .` and open the address it prints. Every requirement document sets `ENABLE_MID: True`, so each node carries a machine ID (`MID`) that stays the same when its UID or title changes. The server's Diff screen and the release changelog match nodes by that ID. After adding a node by hand, run `strictdoc manage auto-uid .` to give it one. `make release` needs Chromium and the GitHub CLI (`gh`), logged in.
 
 ## The simulator scenario
 

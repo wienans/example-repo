@@ -2,6 +2,9 @@
 ELEMENTS:
 - TAG: TEXT
   FIELDS:
+  - TITLE: MID
+    TYPE: String
+    REQUIRED: False
   - TITLE: UID
     TYPE: String
     REQUIRED: False
@@ -10,6 +13,9 @@ ELEMENTS:
     REQUIRED: True
 - TAG: REQUIREMENT
   FIELDS:
+  - TITLE: MID
+    TYPE: String
+    REQUIRED: False
   - TITLE: UID
     TYPE: String
     REQUIRED: False

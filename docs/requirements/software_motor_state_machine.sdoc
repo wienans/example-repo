@@ -1,10 +1,14 @@
 [DOCUMENT]
+MID: fc253b52984e44dcab1a569b885010b8
 TITLE: Domain: motor state machine
+OPTIONS:
+  ENABLE_MID: True
 
 [GRAMMAR]
 IMPORT_FROM_FILE: software_requirements.sgra
 
 [REQUIREMENT]
+MID: 63c9848a0ae1497196ffa079e428d789
 UID: SWR-FSM-001
 TITLE: Motor states
 STATEMENT: >>>
@@ -16,6 +20,7 @@ RELATIONS:
   VALUE: SYS-002
 
 [REQUIREMENT]
+MID: 63d9c7c3142f4532b187eecd33defae5
 UID: SWR-FSM-002
 TITLE: Start and stop transitions
 STATEMENT: >>>
@@ -28,6 +33,7 @@ RELATIONS:
   VALUE: SYS-002
 
 [REQUIREMENT]
+MID: 148239a9d84f437282de2c49b7afc716
 UID: SWR-FSM-003
 TITLE: Fault entry and acknowledge
 STATEMENT: >>>

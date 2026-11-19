@@ -13,7 +13,7 @@ SIM_DIRS  := src/app src/domain src/middleware src/bsp src/hal src/hal/port/host
 SIM_SRCS  := $(foreach d,$(SIM_DIRS),$(wildcard $(d)/*.c))
 SIM_FLAGS := -std=c99 -Wall -Wextra -Wconversion -Werror -O2 $(addprefix -I,$(SIM_DIRS))
 
-.PHONY: all lint test trace sim diagrams docs clean
+.PHONY: all lint test trace sim diagrams docs release clean
 
 all: lint test trace sim
 
@@ -63,6 +63,21 @@ docs: diagrams
 	$(STRICTDOC) export . --output-dir build/strictdoc
 	mkdir -p $(SITE_DOCS)/gcovr
 	-cp build/ceedling/artifacts/gcov/gcovr/GcovCoverageResults* $(SITE_DOCS)/gcovr/
+
+# make release VERSION=v1.2.3 [PREVIOUS=v1.2.2] [PUBLISH=0]
+# - make trace runs first, so a release never ships a requirement without a
+#   passing test.
+# - The generated Test results and Code coverage documents are removed, so
+#   the PDF holds only the committed documents.
+# - tools/release.py tags HEAD, prints all documents into one PDF and the
+#   StrictDoc changelog since PREVIOUS (default: the latest tag) into a
+#   second, then pushes main and the tag and creates a GitHub release with
+#   both PDFs. PUBLISH=0 builds the PDFs into build/release/ and stops.
+release: trace
+	@test -n "$(VERSION)" || { echo "usage: make release VERSION=v1.2.3 [PREVIOUS=v1.2.2] [PUBLISH=0]"; exit 1; }
+	rm -f $(GENERATED_DOCS)/*.sdoc
+	STRICTDOC=$(STRICTDOC) $(PYTHON) tools/release.py $(VERSION) \
+		$(if $(PREVIOUS),--previous $(PREVIOUS)) $(if $(filter 0,$(PUBLISH)),--no-publish)
 
 clean:
 	rm -rf build $(GENERATED_DOCS)/*.sdoc

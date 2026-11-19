@@ -10,6 +10,10 @@ def create_config() -> ProjectConfig:
             "DEEP_TRACEABILITY_SCREEN",
             "REQUIREMENT_TO_SOURCE_TRACEABILITY",
             "PROJECT_STATISTICS_SCREEN",
+            # make release prints the documents to PDF and the changes since
+            # the previous release from the Diff screen.
+            "HTML2PDF",
+            "DIFF",
         ],
         # Colours the generated test results and coverage by status.
         custom_css_path="tools/strictdoc/site.css",

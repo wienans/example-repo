@@ -1,10 +1,14 @@
 [DOCUMENT]
+MID: 0ca0b06efc0543b8863322d50e460cdc
 TITLE: Board support package
+OPTIONS:
+  ENABLE_MID: True
 
 [GRAMMAR]
 IMPORT_FROM_FILE: software_requirements.sgra
 
 [REQUIREMENT]
+MID: a959a723878e40278fea5458965db8a7
 UID: SWR-BSP-001
 TITLE: Encoder speed conversion
 STATEMENT: >>>
@@ -19,6 +23,7 @@ RELATIONS:
   VALUE: SYS-006
 
 [REQUIREMENT]
+MID: d4763931253b4f72b8db96e635d408c1
 UID: SWR-BSP-002
 TITLE: Current conversion
 STATEMENT: >>>
@@ -32,6 +37,7 @@ RELATIONS:
   VALUE: SYS-006
 
 [REQUIREMENT]
+MID: 58bfcbea03ca470580d5daa44f75f23a
 UID: SWR-BSP-003
 TITLE: Drive command mapping
 STATEMENT: >>>
@@ -44,6 +50,7 @@ RELATIONS:
   VALUE: SYS-006
 
 [REQUIREMENT]
+MID: 848047753a794ba8ae0c4f7f0a0baed7
 UID: SWR-BSP-004
 TITLE: Checked initialisation
 STATEMENT: >>>

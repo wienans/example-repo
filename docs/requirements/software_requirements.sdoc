@@ -1,13 +1,17 @@
 [DOCUMENT]
+MID: 384be1118404454192d2917e1083d72c
 TITLE: Software requirements
 UID: DOC-SWR
 OPTIONS:
+  ENABLE_MID: True
   VIEW_STYLE: Table
 
 [[SECTION]]
+MID: 811c4244304c46d08e94da7fcc625298
 TITLE: Conventions
 
 [TEXT]
+MID: a0de5ed0721a4c66b0aaaf2eaa6c0369
 STATEMENT: >>>
 Each requirement names the module that implements it. Code and tests point back
 at a requirement with a marker inside their Doxygen comment, in the form
