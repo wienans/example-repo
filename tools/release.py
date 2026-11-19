@@ -31,6 +31,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 OUT = ROOT / "build" / "release"
 VERSION_RE = re.compile(r"^v\d+\.\d+\.\d+$")
+COVERAGE_JSON = ROOT / "build/ceedling/artifacts/gcov/gcovr/GcovCoverage.json"
 
 # The Diff screen is laid out for a browser window: a fixed-height grid
 # with a scrolling main area. For print, everything flows on the page, and
@@ -223,6 +224,11 @@ def main() -> None:
     args = parser.parse_args()
 
     check_repo(args.version)
+    # make reports leaves a placeholder coverage document when gcovr did not
+    # run. A release must not ship that.
+    if not COVERAGE_JSON.exists():
+        fail(f"{COVERAGE_JSON.relative_to(ROOT)} is missing; run make reports "
+             "and check that gcovr is installed")
     previous = args.previous or git("describe", "--tags", "--abbrev=0", "HEAD")
     git("rev-parse", "--verify", f"{previous}^{{commit}}")
     env = tool_env()

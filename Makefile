@@ -3,6 +3,11 @@ PYTHON    ?= python3
 CEEDLING  ?= ceedling
 DOXYGEN   ?= doxygen
 STRICTDOC ?= $(if $(wildcard /opt/sdvenv/bin/strictdoc),/opt/sdvenv/bin/strictdoc,strictdoc)
+# Ceedling's gcov plugin calls gcovr by name, so a gcovr installed next to
+# StrictDoc in its virtualenv must be on PATH.
+ifneq ($(wildcard /opt/sdvenv/bin),)
+export PATH := /opt/sdvenv/bin:$(PATH)
+endif
 PUPPETEER_EXECUTABLE_PATH ?= $(shell command -v chromium 2>/dev/null)
 export PUPPETEER_EXECUTABLE_PATH
 
@@ -48,7 +53,7 @@ diagrams:
 # - StrictDoc only rewrites a page whose own inputs changed, so a requirement
 #   page would keep stale result links: the site starts from scratch too.
 # - The generated documents go to docs/generated/, at the depth of
-#   docs/requirements/. StrictDoc builds a requirement's links to code from
+#   docs/01_requirements/. StrictDoc builds a requirement's links to code from
 #   the depth of its own document, so a document at another depth, or a
 #   second export input path, gets broken links. Git ignores them through
 #   docs/generated/.gitignore; StrictDoc reads only the root .gitignore.

@@ -12,8 +12,8 @@ Example firmware for closed-loop speed control of a brushed DC motor. It holds t
 | `src/bsp/` | Board pin map and unit conversion, written against the HAL headers |
 | `src/hal/` | HAL interface headers. `src/hal/port/<mcu>/` holds one implementation per MCU |
 | `tests/unit/` | Ceedling unit tests, one directory per layer |
-| `docs/requirements/` | System and software requirements in StrictDoc `.sdoc`. `software_requirements.sdoc` includes one `software_<domain>.sdoc` per domain, kept in the same folder so StrictDoc's links to code resolve |
-| `docs/architecture/` | Diagram conventions, C4 context, container and component views, layering, runtime, porting guide |
+| `docs/01_requirements/` | System and software requirements in StrictDoc `.sdoc`. `software_requirements.sdoc` includes one `software_<domain>.sdoc` per domain, kept in the same folder so StrictDoc's links to code resolve |
+| `docs/02_architecture/` | Diagram conventions, C4 context, container and component views, layering, runtime, porting guide |
 | `docs/adr/` | Architecture decision records |
 | `tools/` | `check_layers.py`, `check_trace.py` and `check_diagrams.py`, the checks behind `make lint`, `make trace` and `make diagrams`. `test_results_to_sdoc.py` and `coverage_to_sdoc.py` generate the Test results and Code coverage documents for `make docs`. `source_markers.py` reads the `@relation` markers for all of them |
 
@@ -36,7 +36,7 @@ Run each check from the repo root.
 | `make test` | Builds and runs every Ceedling unit test |
 | `make trace` | Runs `make test`, then fails if a software requirement has no passing test or check that names it, or no code that implements it, or if a marker has the wrong role for its directory |
 | `make sim` | Builds the firmware with the host HAL port, runs a 2.5 s scenario, writes `build/sim/telemetry.csv` |
-| `make diagrams` | Checks every Mermaid diagram in `docs/` against `docs/architecture/00_diagram_conventions.md` and renders it to `build/diagrams/` |
+| `make diagrams` | Checks every Mermaid diagram in `docs/` against `docs/02_architecture/00_diagram_conventions.md` and renders it to `build/diagrams/` |
 | `make docs` | Runs `make diagrams`, runs the unit tests once with coverage, then builds the Doxygen API reference and the StrictDoc site with the Test results and Code coverage documents. Fails on a broken requirement link, not on a failing test, which shows red |
 | `make all` | Runs `lint`, `test`, `trace` and `sim` |
 | `make release VERSION=v1.2.3` | Runs `make trace` and the coverage run of `make docs`, tags HEAD, and builds two PDFs into `build/release/`: every StrictDoc document in one file, including Test results and Code coverage, and the StrictDoc changelog since the previous tag. Then pushes `main` and the tag, and creates a GitHub release with both PDFs. `PREVIOUS=v1.2.0` picks the tag to compare with, `PUBLISH=0` stops after the PDFs and removes the tag |
@@ -64,4 +64,4 @@ The role says what the marker is evidence of: `role=Implementation` in `src/`, `
 
 ## Port to a new MCU
 
-Follow the porting guide in `docs/architecture/06_porting_guide.md`. A port adds `src/hal/port/<mcu>/` and may edit `src/bsp/board_config.h`. It changes nothing in `src/app`, `src/domain` or `src/middleware`.
+Follow the porting guide in `docs/02_architecture/06_porting_guide.md`. A port adds `src/hal/port/<mcu>/` and may edit `src/bsp/board_config.h`. It changes nothing in `src/app`, `src/domain` or `src/middleware`.

@@ -5,7 +5,7 @@
 
 ## Context
 
-The architecture pages show the C4 system context, container and component views. Mermaid offers native `C4Context`, `C4Container` and `C4Component` types. The two skills behind [Diagram conventions](../architecture/00_diagram_conventions.md) disagree on them:
+The architecture pages show the C4 system context, container and component views. Mermaid offers native `C4Context`, `C4Container` and `C4Component` types. The two skills behind [Diagram conventions](../02_architecture/00_diagram_conventions.md) disagree on them:
 
 - mastery-of-mermaid makes native `C4Context` its default for the overview level. It names a plain flowchart as the fallback "when Mermaid's C4 layout drops a relationship label across a box".
 - design-doc-mermaid draws every C4 view as a `flowchart` with subgraphs.

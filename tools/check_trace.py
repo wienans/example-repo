@@ -25,7 +25,7 @@ checks the other direction. It fails when:
 - a software requirement has no ``Implementation`` marker. A requirement that a
   ``Check`` verifies is exempt, because it constrains every source file rather
   than naming one,
-- a ``docs/requirements/software_*.sdoc`` domain file is not included by
+- a ``docs/01_requirements/software_*.sdoc`` domain file is not included by
   ``software_requirements.sdoc``, because StrictDoc would silently leave it out.
 
 This script checks traceability, not layering or determinism, so it carries no
@@ -43,7 +43,7 @@ from source_markers import ROOT, Marker, read_markers
 # PARENT includes one software_<domain>.sdoc per domain from its own folder.
 # StrictDoc links a requirement to its code from the depth of the file that
 # defines it, so the domain files sit next to PARENT, not in a subfolder.
-PARENT = ROOT / "docs" / "requirements" / "software_requirements.sdoc"
+PARENT = ROOT / "docs" / "01_requirements" / "software_requirements.sdoc"
 REQUIREMENTS_DIR = PARENT.parent
 DOMAIN_GLOB = "software_*.sdoc"
 JUNIT_REPORT = ROOT / "build" / "ceedling" / "artifacts" / "test" / "junit_tests_report.xml"

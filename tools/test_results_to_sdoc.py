@@ -36,7 +36,7 @@ JUNIT_REPORT = ROOT / "build" / "ceedling" / "artifacts" / "gcov" / "junit_tests
 # StrictDoc excludes every root .gitignore entry, so build/ is never scanned,
 # and a second export input path breaks the links from requirements to code.
 # docs/generated/ keeps its own .gitignore, which StrictDoc does not read. It
-# sits at the depth of docs/requirements/: StrictDoc links a requirement to
+# sits at the depth of docs/01_requirements/: StrictDoc links a requirement to
 # its code from the depth of the document it is shown in.
 OUT = ROOT / "docs" / "generated" / "test_results.sdoc"
 

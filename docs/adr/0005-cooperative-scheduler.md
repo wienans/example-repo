@@ -16,5 +16,5 @@ Elapsed time is `now_ms - last_run_ms` in `uint32_t`. Unsigned subtraction gives
 ## Consequences
 
 - No task preempts another, so `app` needs no locks around the `motor_control_t` instance.
-- A task that overruns delays the next one. Each task must finish well inside 1 ms. The [runtime page](../architecture/05_runtime.md) lists the work per task.
+- A task that overruns delays the next one. Each task must finish well inside 1 ms. The [runtime page](../02_architecture/05_runtime.md) lists the work per task.
 - Moving to an RTOS later means replacing `scheduler.c` and `app_poll`. The domain and BSP do not change.

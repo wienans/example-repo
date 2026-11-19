@@ -64,7 +64,7 @@ GCOVR_JSON = ROOT / "build" / "ceedling" / "artifacts" / "gcov" / "gcovr" / "Gco
 OUT = ROOT / "docs" / "generated" / "coverage.sdoc"
 # gcovr's HTML. StrictDoc also shows coverage nodes on the requirement pages,
 # so the link climbs to docs/ first: it resolves from docs/generated/ and from
-# docs/requirements/, which sit at the same depth.
+# docs/01_requirements/, which sit at the same depth.
 GCOVR_HTML = "../generated/gcovr"
 GCOVR_PREFIX = "GcovCoverageResults"
 

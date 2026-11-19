@@ -2,7 +2,7 @@
 """Validate every Mermaid diagram in the Markdown docs.
 
 Each ```mermaid block under docs/ must follow
-docs/architecture/00_diagram_conventions.md:
+docs/02_architecture/00_diagram_conventions.md:
 
 1. Its type is one of ALLOWED_TYPES.
 2. The two lines after the type keyword are accTitle and accDescr.
