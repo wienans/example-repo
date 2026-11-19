@@ -9,10 +9,13 @@ Usage: release.py VERSION [--previous TAG] [--no-publish]
    build/release/documentation-VERSION.pdf
 4. Prints StrictDoc's Diff screen, Changelog tab, from the previous tag to
    VERSION: build/release/changes-PREVIOUS-to-VERSION.pdf
-5. Pushes main and the tag, and creates a GitHub release with both PDFs.
+5. Zips the HTML that make docs built, build/strictdoc/html and
+   build/doxygen/html, into build/release/docs-VERSION.zip.
+6. Pushes main and the tag, and creates a GitHub release with the two PDFs
+   and the zip.
 
 A failing build deletes the local tag again. --no-publish stops after step 4
-and deletes the tag, to check the PDFs before a real release.
+and deletes the tag, to check the files before a real release.
 """
 
 import argparse
@@ -26,12 +29,18 @@ import sys
 import time
 import urllib.parse
 import urllib.request
+import zipfile
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 OUT = ROOT / "build" / "release"
 VERSION_RE = re.compile(r"^v\d+\.\d+\.\d+$")
 COVERAGE_JSON = ROOT / "build/ceedling/artifacts/gcov/gcovr/GcovCoverage.json"
+# Folders that make docs builds, and their names inside the zip.
+SITES = {
+    ROOT / "build" / "strictdoc" / "html": "strictdoc/html",
+    ROOT / "build" / "doxygen" / "html": "doxygen/html",
+}
 
 # The Diff screen is laid out for a browser window: a fixed-height grid
 # with a scrolling main area. For print, everything flows on the page, and
@@ -197,18 +206,30 @@ def build_diff_pdf(env: dict, previous: str, version: str) -> Path:
         log.close()
 
 
-def publish(version: str, previous: str, pdfs: list) -> None:
+def build_site_zip(version: str) -> Path:
+    target = OUT / f"docs-{version}.zip"
+    with zipfile.ZipFile(target, "w", zipfile.ZIP_DEFLATED) as archive:
+        for folder, name in SITES.items():
+            for path in sorted(folder.rglob("*")):
+                if path.is_file():
+                    archive.write(path, f"{name}/{path.relative_to(folder)}")
+    return target
+
+
+def publish(version: str, previous: str, files: list) -> None:
     run("git", "push", "origin", "main")
     run("git", "push", "origin", version)
     notes = (
         f"Documentation of {version}.\n\n"
-        f"- `{pdfs[0].name}`: every requirement, architecture page and ADR, "
+        f"- `{files[0].name}`: every requirement, architecture page and ADR, "
         "with the test results and code coverage of this version.\n"
-        f"- `{pdfs[1].name}`: what changed since {previous}, from the "
-        "StrictDoc Diff screen."
+        f"- `{files[1].name}`: what changed since {previous}, from the "
+        "StrictDoc Diff screen.\n"
+        f"- `{files[2].name}`: the StrictDoc site (`strictdoc/html/index.html`) "
+        "and the Doxygen API reference (`doxygen/html/index.html`)."
     )
     run(
-        "gh", "release", "create", version, *map(str, pdfs),
+        "gh", "release", "create", version, *map(str, files),
         "--verify-tag", "--title", version, "--notes", notes,
         "--generate-notes", "--notes-start-tag", previous,
     )
@@ -229,6 +250,9 @@ def main() -> None:
     if not COVERAGE_JSON.exists():
         fail(f"{COVERAGE_JSON.relative_to(ROOT)} is missing; run make reports "
              "and check that gcovr is installed")
+    for folder in SITES:
+        if not (folder / "index.html").exists():
+            fail(f"{folder.relative_to(ROOT)}/index.html is missing; run make docs")
     previous = args.previous or git("describe", "--tags", "--abbrev=0", "HEAD")
     git("rev-parse", "--verify", f"{previous}^{{commit}}")
     env = tool_env()
@@ -237,20 +261,21 @@ def main() -> None:
     OUT.mkdir(parents=True)
     run("git", "tag", "-a", args.version, "-m", f"Release {args.version}")
     try:
-        pdfs = [
+        files = [
             build_full_pdf(env, args.version),
             build_diff_pdf(env, previous, args.version),
+            build_site_zip(args.version),
         ]
     except BaseException:
         run("git", "tag", "-d", args.version)
         raise
-    for pdf in pdfs:
-        print(f"release: wrote {pdf.relative_to(ROOT)}")
+    for file in files:
+        print(f"release: wrote {file.relative_to(ROOT)}")
 
     if args.no_publish:
         run("git", "tag", "-d", args.version)
         return
-    publish(args.version, previous, pdfs)
+    publish(args.version, previous, files)
 
 
 if __name__ == "__main__":

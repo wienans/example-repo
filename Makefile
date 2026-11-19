@@ -76,19 +76,21 @@ docs: diagrams reports
 # make release VERSION=v1.2.3 [PREVIOUS=v1.2.2] [PUBLISH=0]
 # - make trace runs first, so a release never ships a requirement without a
 #   passing test.
-# - make reports regenerates the Test results and Code coverage documents,
-#   so the full PDF ends with them. They are git-ignored, so the changelog
-#   PDF, which compares two git tags, never lists them.
+# - make docs builds the StrictDoc site and the Doxygen reference, and through
+#   make reports the Test results and Code coverage documents, so the full PDF
+#   ends with them. They are git-ignored, so the changelog PDF, which compares
+#   two git tags, never lists them.
 # - tools/release.py tags HEAD, prints all documents into one PDF and the
 #   StrictDoc changelog since PREVIOUS (default: the latest tag) into a
-#   second, then pushes main and the tag and creates a GitHub release with
-#   both PDFs. PUBLISH=0 builds the PDFs into build/release/ and stops.
+#   second, zips build/strictdoc/html and build/doxygen/html, then pushes main
+#   and the tag and creates a GitHub release with the two PDFs and the zip.
+#   PUBLISH=0 builds the files into build/release/ and stops.
 ifneq ($(filter release,$(MAKECMDGOALS)),)
 ifndef VERSION
 $(error usage: make release VERSION=v1.2.3 [PREVIOUS=v1.2.2] [PUBLISH=0])
 endif
 endif
-release: trace reports
+release: trace docs
 	STRICTDOC=$(STRICTDOC) $(PYTHON) tools/release.py $(VERSION) \
 		$(if $(PREVIOUS),--previous $(PREVIOUS)) $(if $(filter 0,$(PUBLISH)),--no-publish)
 
