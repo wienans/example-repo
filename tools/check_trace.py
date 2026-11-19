@@ -7,7 +7,9 @@ markers that name an unknown UID, so this script checks the other direction.
 It also fails when a file in ``docs/requirements/software/`` is not included by
 ``software_requirements.sdoc``, because StrictDoc would silently leave it out.
 
-@relation(SWR-ARC-001, SWR-DET-001, scope=file)
+This script checks traceability, not layering or determinism, so it carries no
+marker of its own. A marker here would count as evidence for a requirement it
+does not verify.
 """
 
 import pathlib
