@@ -23,7 +23,7 @@ The pieces connect in four places:
 3. Markdown pages link to requirements with `[LINK: UID]`. StrictDoc resolves the tag and fails on an unknown UID.
 4. `tools/check_diagrams.py` checks every Mermaid diagram against `docs/architecture/00_diagram_conventions.md` and renders it with Mermaid CLI. `make docs` runs it first, so a diagram that does not render never reaches the StrictDoc site.
 
-StrictDoc's HTML bundles Mermaid, so the diagrams render offline. Doxygen 1.9 cannot render Mermaid, so Doxygen reads only `src/` and the README. The README names other docs by path instead of linking them, because Doxygen fails on a link to a file outside its input.
+StrictDoc's HTML bundles Mermaid, so the diagrams render offline. Doxygen renders Mermaid since 1.17, but the diagrams already have one home in the StrictDoc site, so Doxygen reads only `src/` and the README. The README names other docs by path instead of linking them, because Doxygen fails on a link to a file outside its input.
 
 ## Consequences
 

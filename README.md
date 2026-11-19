@@ -23,7 +23,7 @@ Example firmware for closed-loop speed control of a brushed DC motor. It holds t
 - Ruby and Ceedling 1.x: `gem install ceedling`
 - Python 3.10 or later
 - StrictDoc: `pip install strictdoc`
-- Doxygen 1.9 or later and Graphviz
+- Doxygen 1.18 or later and Graphviz. Debian and Ubuntu ship older versions, so install the Linux binary from doxygen.nl and put its `bin/` on `PATH`, or run `make docs DOXYGEN=/path/to/doxygen`
 - Node.js and Mermaid CLI: `npm install -g @mermaid-js/mermaid-cli`. Set `PUPPETEER_EXECUTABLE_PATH` if Chromium is not where Puppeteer expects it
 
 ## Build and check
