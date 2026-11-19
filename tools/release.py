@@ -56,6 +56,17 @@ turbo-frame, .changelog, .changelog_content, .changelog_changes {
   position: static !important;
 }
 body { background: white !important; }
+/* diff.css fades the changelog (.preloaded) in from opacity 0 over 1 s.
+   Chrome may print before the fade ends, so the print has no animations. */
+* { animation: none !important; transition: none !important; }
+.preloaded { opacity: 1 !important; }
+/* StrictDoc's web fonts load from the server, and text in a font that is
+   still loading is invisible. Chrome may print before they arrive, so the
+   print uses system fonts only. */
+* { font-family: "DejaVu Sans", Arial, sans-serif !important; }
+pre, code, .sdoc_pre_content, .badge, .sdoc-table_key_value-section {
+  font-family: "DejaVu Sans Mono", monospace !important;
+}
 .layout_nav, .layout_header, .layout_footer, .layout_aside, .layout_toc,
 .layout_tree, sdoc-form, sdoc-toast, .sdoc-tabs, .skeleton { display: none !important; }
 .release-title { font: 600 20px sans-serif; margin: 0 0 16px; }
