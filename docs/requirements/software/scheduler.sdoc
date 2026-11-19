@@ -1,0 +1,14 @@
+[DOCUMENT]
+TITLE: Middleware: scheduler
+
+[REQUIREMENT]
+UID: SWR-SCH-001
+TITLE: Fixed-period cooperative scheduling
+STATEMENT: >>>
+``sched_run`` shall call each task whose period has elapsed since its last run,
+in table order, once per call. It shall keep the period correct when the
+millisecond tick wraps around ``UINT32_MAX``.
+<<<
+RELATIONS:
+- TYPE: Parent
+  VALUE: SYS-007

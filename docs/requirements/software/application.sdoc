@@ -1,0 +1,27 @@
+[DOCUMENT]
+TITLE: Application
+
+[REQUIREMENT]
+UID: SWR-APP-001
+TITLE: Task periods
+STATEMENT: >>>
+The application shall run the control task every 1 ms and the user interface
+task every 10 ms.
+<<<
+RELATIONS:
+- TYPE: Parent
+  VALUE: SYS-007
+
+[REQUIREMENT]
+UID: SWR-APP-002
+TITLE: Button events
+STATEMENT: >>>
+A rising edge of the start button shall send ``START``. A rising edge of the
+stop button shall send ``CLEAR_FAULT`` in ``FAULT`` and ``STOP`` in every other
+state.
+<<<
+RELATIONS:
+- TYPE: Parent
+  VALUE: SYS-002
+- TYPE: Parent
+  VALUE: SYS-005

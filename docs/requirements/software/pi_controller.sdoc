@@ -1,0 +1,41 @@
+[DOCUMENT]
+TITLE: Domain: PI controller
+
+[REQUIREMENT]
+UID: SWR-PI-001
+TITLE: Proportional-integral output
+STATEMENT: >>>
+``pi_step`` shall return ``Kp * e + I``, clamped to ``[out_min, out_max]``,
+where ``e`` is the speed error and ``I`` is the accumulated integral term
+``sum(Ki * e)``. Gains are Q8 fixed-point integers, so a gain of 256 is 1.0.
+<<<
+RELATIONS:
+- TYPE: Parent
+  VALUE: SYS-001
+- TYPE: Parent
+  VALUE: SYS-007
+
+[REQUIREMENT]
+UID: SWR-PI-002
+TITLE: Integrator anti-windup
+STATEMENT: >>>
+The integral term shall stay within the output limits, and shall not grow
+further while the output is saturated in the direction of the error.
+<<<
+RATIONALE: >>>
+Without this, a long saturation stores a large integral that overshoots the
+setpoint when the load releases.
+<<<
+RELATIONS:
+- TYPE: Parent
+  VALUE: SYS-001
+
+[REQUIREMENT]
+UID: SWR-PI-003
+TITLE: Controller reset
+STATEMENT: >>>
+``pi_reset`` shall set the integral term to zero.
+<<<
+RELATIONS:
+- TYPE: Parent
+  VALUE: SYS-001

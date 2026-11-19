@@ -12,7 +12,7 @@ Example firmware for closed-loop speed control of a brushed DC motor. It holds t
 | `src/bsp/` | Board pin map and unit conversion, written against the HAL headers |
 | `src/hal/` | HAL interface headers. `src/hal/port/<mcu>/` holds one implementation per MCU |
 | `tests/unit/` | Ceedling unit tests, one directory per layer |
-| `docs/requirements/` | System and software requirements in StrictDoc `.sdoc` |
+| `docs/requirements/` | System and software requirements in StrictDoc `.sdoc`. `software_requirements.sdoc` includes one file per domain from `software/` |
 | `docs/architecture/` | Diagram conventions, C4 context, container and component views, layering, runtime, porting guide |
 | `docs/adr/` | Architecture decision records |
 | `tools/` | `check_layers.py`, `check_trace.py` and `check_diagrams.py`, the checks behind `make lint`, `make trace` and `make diagrams` |

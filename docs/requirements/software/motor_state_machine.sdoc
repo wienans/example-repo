@@ -1,0 +1,36 @@
+[DOCUMENT]
+TITLE: Domain: motor state machine
+
+[REQUIREMENT]
+UID: SWR-FSM-001
+TITLE: Motor states
+STATEMENT: >>>
+The motor state machine shall have the states ``IDLE``, ``RUNNING`` and
+``FAULT``, and shall start in ``IDLE``.
+<<<
+RELATIONS:
+- TYPE: Parent
+  VALUE: SYS-002
+
+[REQUIREMENT]
+UID: SWR-FSM-002
+TITLE: Start and stop transitions
+STATEMENT: >>>
+The ``START`` event shall move ``IDLE`` to ``RUNNING``. The ``STOP`` event
+shall move ``RUNNING`` to ``IDLE``. Any other event in those states shall leave
+the state unchanged, except ``FAULT``.
+<<<
+RELATIONS:
+- TYPE: Parent
+  VALUE: SYS-002
+
+[REQUIREMENT]
+UID: SWR-FSM-003
+TITLE: Fault entry and acknowledge
+STATEMENT: >>>
+The ``FAULT`` event shall move every state to ``FAULT``. In ``FAULT``, only
+``CLEAR_FAULT`` shall change the state, and it shall move to ``IDLE``.
+<<<
+RELATIONS:
+- TYPE: Parent
+  VALUE: SYS-005

@@ -1,0 +1,30 @@
+[DOCUMENT]
+TITLE: Architecture constraints
+
+[REQUIREMENT]
+UID: SWR-ARC-001
+TITLE: Layer include rule
+STATEMENT: >>>
+Source files shall include only headers from the layers they may depend on:
+``app`` on ``app``, ``domain``, ``middleware`` and ``bsp``. ``domain`` on
+``domain``. ``middleware`` on ``middleware``. ``bsp`` on ``bsp``, ``hal`` and
+``domain``. ``hal`` on ``hal``. Only ``src/hal/port`` may include vendor
+headers. ``tools/check_layers.py`` enforces this rule.
+<<<
+RELATIONS:
+- TYPE: Parent
+  VALUE: SYS-006
+- TYPE: Parent
+  VALUE: SYS-008
+
+[REQUIREMENT]
+UID: SWR-DET-001
+TITLE: No heap and no floating point
+STATEMENT: >>>
+Source files outside ``src/hal/port`` shall not call ``malloc``, ``calloc``,
+``realloc`` or ``free``, and shall not use ``float`` or ``double``.
+``tools/check_layers.py`` enforces this rule.
+<<<
+RELATIONS:
+- TYPE: Parent
+  VALUE: SYS-007

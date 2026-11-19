@@ -1,0 +1,52 @@
+[DOCUMENT]
+TITLE: Board support package
+
+[REQUIREMENT]
+UID: SWR-BSP-001
+TITLE: Encoder speed conversion
+STATEMENT: >>>
+``bsp_motor_sample`` shall compute the speed from the change of the 16-bit
+encoder count since the previous sample, the board's counts per revolution and
+the 1 ms sample period. The result shall be correct when the counter wraps.
+<<<
+RELATIONS:
+- TYPE: Parent
+  VALUE: SYS-001
+- TYPE: Parent
+  VALUE: SYS-006
+
+[REQUIREMENT]
+UID: SWR-BSP-002
+TITLE: Current conversion
+STATEMENT: >>>
+``bsp_motor_sample`` shall convert the raw ADC reading of the current-sense
+channel to mA with the board's scale and offset.
+<<<
+RELATIONS:
+- TYPE: Parent
+  VALUE: SYS-003
+- TYPE: Parent
+  VALUE: SYS-006
+
+[REQUIREMENT]
+UID: SWR-BSP-003
+TITLE: Drive command mapping
+STATEMENT: >>>
+``bsp_motor_apply`` shall set the direction pin from the sign of the duty, set
+the PWM duty to the absolute duty, and set the bridge enable pin from
+``enable``.
+<<<
+RELATIONS:
+- TYPE: Parent
+  VALUE: SYS-006
+
+[REQUIREMENT]
+UID: SWR-BSP-004
+TITLE: Checked initialisation
+STATEMENT: >>>
+``bsp_init`` shall check the status of every HAL initialisation call and return
+``false`` if any call fails.
+<<<
+RELATIONS:
+- TYPE: Parent
+  VALUE: SYS-006

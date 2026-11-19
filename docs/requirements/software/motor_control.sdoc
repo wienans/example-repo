@@ -1,0 +1,59 @@
+[DOCUMENT]
+TITLE: Domain: motor control
+
+[REQUIREMENT]
+UID: SWR-CTL-001
+TITLE: Setpoint clamp and ramp
+STATEMENT: >>>
+``motor_control_set_speed`` shall clamp the target to
+``[-max_setpoint_rpm, max_setpoint_rpm]``. Each ``motor_control_step`` call
+shall move the ramped setpoint toward the target by at most
+``ramp_rpm_per_tick``.
+<<<
+RELATIONS:
+- TYPE: Parent
+  VALUE: SYS-001
+
+[REQUIREMENT]
+UID: SWR-CTL-002
+TITLE: Drive disabled outside RUNNING
+STATEMENT: >>>
+In every state other than ``RUNNING``, ``motor_control_step`` shall return a
+drive command with ``enable = false`` and ``duty = 0``.
+<<<
+RELATIONS:
+- TYPE: Parent
+  VALUE: SYS-002
+- TYPE: Parent
+  VALUE: SYS-005
+
+[REQUIREMENT]
+UID: SWR-CTL-003
+TITLE: Bumpless start
+STATEMENT: >>>
+On entering ``RUNNING``, the controller shall reset the PI controller and start
+the ramped setpoint at the measured speed.
+<<<
+RATIONALE: >>>
+Starting the ramp at the measured speed avoids a step in duty when the operator
+restarts a motor that is still coasting.
+<<<
+RELATIONS:
+- TYPE: Parent
+  VALUE: SYS-001
+
+[REQUIREMENT]
+UID: SWR-CTL-004
+TITLE: Same-step fault shutdown
+STATEMENT: >>>
+When the fault monitor reports a fault, ``motor_control_step`` shall latch the
+fault flags, move the state machine to ``FAULT``, and return a disabled drive
+command in that same call. ``CLEAR_FAULT`` shall clear the latched flags.
+<<<
+RELATIONS:
+- TYPE: Parent
+  VALUE: SYS-003
+- TYPE: Parent
+  VALUE: SYS-004
+- TYPE: Parent
+  VALUE: SYS-005
