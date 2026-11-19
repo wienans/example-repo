@@ -38,8 +38,25 @@ sim: $(SIM_BIN)
 diagrams:
 	python3 tools/check_diagrams.py
 
+# make docs runs the unit tests once, under gcov, and publishes the results:
+# - A red test does not stop the site: the leading - lets make carry on and
+#   the result shows red. make trace is the gate that fails on it.
+# - The gcov build and its reports start from scratch. Leftover .gcda
+#   counters would merge into this run, and a stale report would outlive a
+#   build that no longer compiles.
+# - StrictDoc only rewrites a page whose own inputs changed, so a requirement
+#   page would keep stale result links: the site starts from scratch too.
+# - The generated documents live in build/, which StrictDoc's .gitignore
+#   filter skips, so they are passed as input paths of their own.
 docs: diagrams
-	$(DOXYGEN) docs/Doxyfile && $(STRICTDOC) export . --output-dir build/strictdoc
+	rm -rf build/ceedling/gcov build/ceedling/artifacts/gcov build/strictdoc
+	-$(CEEDLING) gcov:all
+	$(PYTHON) tools/test_results_to_sdoc.py
+	$(PYTHON) tools/coverage_to_sdoc.py
+	$(DOXYGEN) docs/Doxyfile
+	$(STRICTDOC) export . build/test_results/test_results.sdoc build/coverage/coverage.sdoc --output-dir build/strictdoc
+	mkdir -p build/strictdoc/html/coverage/gcovr
+	-cp build/ceedling/artifacts/gcov/gcovr/GcovCoverageResults* build/strictdoc/html/coverage/gcovr/
 
 clean:
 	rm -rf build
