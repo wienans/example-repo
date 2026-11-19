@@ -43,20 +43,34 @@ void pi_reset(pi_controller_t *pi)
 
 /**
  * @brief Compute the clamped PI output with conditional integration.
- * @relation(SWR-PI-001, SWR-PI-002, scope=function, role=Implementation)
+ * @relation(SWR-PI-001, scope=function, role=Implementation)
  */
 int32_t pi_step(pi_controller_t *pi, int32_t error)
 {
     const int64_t out_min = pi->cfg.out_min;
     const int64_t out_max = pi->cfg.out_max;
     const int64_t proportional = (int64_t)pi->cfg.kp_q8 * error;
+    /*
+     * Accumulate Ki * e, held within the output limits.
+     * @relation(SWR-PI-001, SWR-PI-002, scope=range_start, role=Implementation)
+     */
     const int64_t integrated = clamp64((int64_t)pi->integrator + (int64_t)pi->cfg.ki_q8 * error,
                                        out_min * Q8_ONE, out_max * Q8_ONE);
+    /*
+     * @relation(SWR-PI-001, SWR-PI-002, scope=range_end, role=Implementation)
+     */
     const int64_t unclamped = (proportional + integrated) / Q8_ONE;
 
+    /*
+     * Anti-windup: keep the integrator while the output saturates with the error.
+     * @relation(SWR-PI-002, scope=range_start, role=Implementation)
+     */
     const bool saturated_with_error = (unclamped > out_max && error > 0) || (unclamped < out_min && error < 0);
     if (!saturated_with_error) {
         pi->integrator = (int32_t)integrated;
     }
+    /*
+     * @relation(SWR-PI-002, scope=range_end, role=Implementation)
+     */
     return (int32_t)clamp64(unclamped, out_min, out_max);
 }
