@@ -138,12 +138,12 @@ graph TB
     JSP --> JSTL
     JSTL -->|Render HTML| Client
 
-    classDef controller fill:#FF6B6B,stroke:#C92A2A,color:#fff
-    classDef service fill:#4ECDC4,stroke:#0B7285,color:#fff
+    classDef controller fill:#FF6B6B,stroke:#C92A2A,color:#000
+    classDef service fill:#4ECDC4,stroke:#0B7285,color:#000
     classDef dao fill:#95E1D3,stroke:#087F5B,color:#000
     classDef view fill:#FFE66D,stroke:#F08C00,color:#000
     classDef db fill:#A8DADC,stroke:#1864AB,color:#000
-    classDef filter fill:#F38181,stroke:#C92A2A,color:#fff
+    classDef filter fill:#F38181,stroke:#C92A2A,color:#000
 
     class ContactCtrl,AuthCtrl,DashboardCtrl controller
     class ContactSvc,AuthSvc service
@@ -373,8 +373,8 @@ graph TB
     MailSession -->|Send Email| SMTP
 
     classDef frontend fill:#FFE66D,stroke:#F08C00,color:#000
-    classDef server fill:#4ECDC4,stroke:#0B7285,color:#fff
-    classDef servlet fill:#FF6B6B,stroke:#C92A2A,color:#fff
+    classDef server fill:#4ECDC4,stroke:#0B7285,color:#000
+    classDef servlet fill:#FF6B6B,stroke:#C92A2A,color:#000
     classDef resource fill:#95E1D3,stroke:#087F5B,color:#000
     classDef external fill:#A8DADC,stroke:#1864AB,color:#000
 
@@ -831,11 +831,11 @@ flowchart TD
     RenderHTML --> LogEnd3[📝 Log request end<br/>Status: 200<br/>Duration: 45ms]
     LogEnd3 --> Success([✅ END - Success])
 
-    classDef filterNode fill:#F38181,stroke:#C92A2A,color:#fff
+    classDef filterNode fill:#F38181,stroke:#C92A2A,color:#000
     classDef decisionNode fill:#FFE66D,stroke:#F08C00,color:#000
-    classDef actionNode fill:#4ECDC4,stroke:#0B7285,color:#fff
+    classDef actionNode fill:#4ECDC4,stroke:#0B7285,color:#000
     classDef successNode fill:#95E1D3,stroke:#087F5B,color:#000
-    classDef errorNode fill:#FF6B6B,stroke:#C92A2A,color:#fff
+    classDef errorNode fill:#FF6B6B,stroke:#C92A2A,color:#000
 
     class LogFilter,CorsFilter,AuthFilter filterNode
     class SessionExists,UserExists,CheckOptions,CheckRole,CheckAdmin,CheckUser decisionNode
@@ -1208,6 +1208,6 @@ Use semantic Unicode symbols consistently:
 - [Node.js/Express → Mermaid](../node-webapp/README.md) - JavaScript patterns
 
 **Guides:**
-- [Activity Diagrams](../../guides/diagrams/activity-diagrams.md)
-- [Deployment Diagrams](../../guides/diagrams/deployment-diagrams.md)
-- [Unicode Symbols](../../guides/unicode-symbols/guide.md)
+- [Activity Diagrams](../../references/guides/diagrams/activity-diagrams.md)
+- [Deployment Diagrams](../../references/guides/diagrams/deployment-diagrams.md)
+- [Unicode Symbols](../../references/guides/unicode-symbols/guide.md)

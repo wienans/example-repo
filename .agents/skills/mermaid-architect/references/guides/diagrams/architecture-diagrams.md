@@ -83,7 +83,7 @@ graph TB
 
     PaymentGateway -->|Payment webhooks| EcommSystem
 
-    classDef systemBoundary fill:#4ECDC4,stroke:#0B7285,color:#fff
+    classDef systemBoundary fill:#4ECDC4,stroke:#0B7285,color:#000
     classDef external fill:#A8DADC,stroke:#1864AB,color:#000
     classDef user fill:#FFE66D,stroke:#F08C00,color:#000
 
@@ -174,11 +174,11 @@ graph TB
     BackgroundWorker -->|SOAP| ExtInventory
 
     classDef frontend fill:#FFE66D,stroke:#F08C00,color:#000
-    classDef gateway fill:#F38181,stroke:#C92A2A,color:#fff
-    classDef service fill:#4ECDC4,stroke:#0B7285,color:#fff
+    classDef gateway fill:#F38181,stroke:#C92A2A,color:#000
+    classDef service fill:#4ECDC4,stroke:#0B7285,color:#000
     classDef database fill:#A8DADC,stroke:#1864AB,color:#000
     classDef messaging fill:#95E1D3,stroke:#087F5B,color:#000
-    classDef external fill:#D4A5A5,stroke:#7D4E57,color:#fff
+    classDef external fill:#D4A5A5,stroke:#7D4E57,color:#000
 
     class WebApp,AdminApp frontend
     class APIGateway gateway
@@ -269,8 +269,8 @@ graph TB
     CacheRepo --> CacheLayer
     ProductService --> ImageStorage
 
-    classDef controller fill:#FF6B6B,stroke:#C92A2A,color:#fff
-    classDef service fill:#4ECDC4,stroke:#0B7285,color:#fff
+    classDef controller fill:#FF6B6B,stroke:#C92A2A,color:#000
+    classDef service fill:#4ECDC4,stroke:#0B7285,color:#000
     classDef repo fill:#95E1D3,stroke:#087F5B,color:#000
     classDef model fill:#FFE66D,stroke:#F08C00,color:#000
     classDef external fill:#A8DADC,stroke:#1864AB,color:#000
@@ -341,7 +341,7 @@ graph TB
     CachePlugin --> ExternalCache
     NotifyPlugin --> ExternalEmail
 
-    classDef core fill:#4ECDC4,stroke:#0B7285,color:#fff
+    classDef core fill:#4ECDC4,stroke:#0B7285,color:#000
     classDef plugin fill:#FFE66D,stroke:#F08C00,color:#000
     classDef external fill:#A8DADC,stroke:#1864AB,color:#000
 
@@ -429,9 +429,9 @@ graph TB
     Repositories -.->|Use| Logging
 
     classDef presentation fill:#FFE66D,stroke:#F08C00,color:#000
-    classDef business fill:#4ECDC4,stroke:#0B7285,color:#fff
+    classDef business fill:#4ECDC4,stroke:#0B7285,color:#000
     classDef data fill:#95E1D3,stroke:#087F5B,color:#000
-    classDef crosscutting fill:#F38181,stroke:#C92A2A,color:#fff
+    classDef crosscutting fill:#F38181,stroke:#C92A2A,color:#000
     classDef database fill:#A8DADC,stroke:#1864AB,color:#000
 
     class WebUI,ViewController,DTOs presentation
@@ -505,8 +505,8 @@ graph TB
     IEmailSender -.->|Implemented by| MockEmailAdapter
 
     classDef driving fill:#FFE66D,stroke:#F08C00,color:#000
-    classDef port fill:#F38181,stroke:#C92A2A,color:#fff
-    classDef core fill:#4ECDC4,stroke:#0B7285,color:#fff
+    classDef port fill:#F38181,stroke:#C92A2A,color:#000
+    classDef core fill:#4ECDC4,stroke:#0B7285,color:#000
     classDef adapter fill:#95E1D3,stroke:#087F5B,color:#000
 
     class WebAPI,CLI,MessageListener driving
@@ -585,8 +585,8 @@ graph TB
     OrderService -.->|HTTP: Get user| UserService
     OrderService -.->|HTTP: Check stock| ProductService
 
-    classDef edge fill:#F38181,stroke:#C92A2A,color:#fff
-    classDef service fill:#4ECDC4,stroke:#0B7285,color:#fff
+    classDef edge fill:#F38181,stroke:#C92A2A,color:#000
+    classDef service fill:#4ECDC4,stroke:#0B7285,color:#000
     classDef database fill:#A8DADC,stroke:#1864AB,color:#000
     classDef messaging fill:#FFE66D,stroke:#F08C00,color:#000
 
@@ -660,8 +660,8 @@ graph TB
 
     Prometheus --> Kiali
 
-    classDef controlplane fill:#F38181,stroke:#C92A2A,color:#fff
-    classDef service fill:#4ECDC4,stroke:#0B7285,color:#fff
+    classDef controlplane fill:#F38181,stroke:#C92A2A,color:#000
+    classDef service fill:#4ECDC4,stroke:#0B7285,color:#000
     classDef proxy fill:#FFE66D,stroke:#F08C00,color:#000
     classDef observability fill:#95E1D3,stroke:#087F5B,color:#000
 
@@ -741,9 +741,9 @@ graph TB
     QueryAPI -->|Read| OrderHistoryDB
     QueryAPI -->|Read| AnalyticsDB
 
-    classDef command fill:#FF6B6B,stroke:#C92A2A,color:#fff
+    classDef command fill:#FF6B6B,stroke:#C92A2A,color:#000
     classDef event fill:#FFE66D,stroke:#F08C00,color:#000
-    classDef query fill:#4ECDC4,stroke:#0B7285,color:#fff
+    classDef query fill:#4ECDC4,stroke:#0B7285,color:#000
     classDef database fill:#A8DADC,stroke:#1864AB,color:#000
 
     class CommandAPI,CommandHandler,Aggregate command
@@ -917,7 +917,7 @@ graph TB
     MobileBFF --> OrderAPI
 
     classDef client fill:#FFE66D,stroke:#F08C00,color:#000
-    classDef bff fill:#4ECDC4,stroke:#0B7285,color:#fff
+    classDef bff fill:#4ECDC4,stroke:#0B7285,color:#000
     classDef api fill:#95E1D3,stroke:#087F5B,color:#000
 
     class WebClient,MobileClient client
@@ -959,7 +959,7 @@ graph TB
     NewUserService -.->|Read legacy data<br/>during migration| LegacyDB
 
     classDef new fill:#95E1D3,stroke:#087F5B,color:#000
-    classDef legacy fill:#D4A5A5,stroke:#7D4E57,color:#fff
+    classDef legacy fill:#D4A5A5,stroke:#7D4E57,color:#000
     classDef proxy fill:#FFE66D,stroke:#F08C00,color:#000
 
     class NewUserService,NewProductService,NewUserDB,NewProductDB new

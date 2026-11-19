@@ -61,7 +61,7 @@ flowchart TD
     classDef process fill:#FFE66D,stroke:#F08C00,color:#000
     classDef decision fill:#A8DADC,stroke:#1864AB,color:#000
     classDef success fill:#95D5B2,stroke:#2D6A4F,color:#000
-    classDef error fill:#E63946,stroke:#9D0208,color:#fff
+    classDef error fill:#E63946,stroke:#9D0208,color:#000
 
     class Start,Complete start
     class Type,Reference,Generate,Save,Validate,AddRef,Apply,Troubleshoot,Search process
@@ -552,7 +552,7 @@ Only after validation succeeds:
 ### Example 2: Handling Validation Error
 
 **Diagram Code:**
-```mermaid
+```text
 flowchart TD
     start --> end
 ```

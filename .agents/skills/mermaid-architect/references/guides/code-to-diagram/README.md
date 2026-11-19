@@ -36,12 +36,12 @@ This master guide explains how to analyze source code and configuration files to
 
 | Framework | Language | Architecture Style | Example Guide |
 |-----------|----------|-------------------|---------------|
-| **Spring Boot** | Java | Annotation-driven, layered | [Spring Boot Guide](../../examples/spring-boot/README.md) |
-| **FastAPI** | Python | Async, dependency injection | [FastAPI Guide](../../examples/fastapi/README.md) |
-| **React** | JavaScript/TypeScript | Component-based, state management | [React Guide](../../examples/react/README.md) |
-| **Express.js** | JavaScript/TypeScript | Middleware chain, routes | [Node.js Guide](../../examples/node-webapp/README.md) |
-| **Java Servlet** | Java | MVC Model 2, filters | [Java Servlet Guide](../../examples/java-webapp/README.md) |
-| **Python ETL** | Python | Data pipelines, transformations | [Python ETL Guide](../../examples/python-etl/README.md) |
+| **Spring Boot** | Java | Annotation-driven, layered | [Spring Boot Guide](../../../examples/spring-boot/README.md) |
+| **FastAPI** | Python | Async, dependency injection | [FastAPI Guide](../../../examples/fastapi/README.md) |
+| **React** | JavaScript/TypeScript | Component-based, state management | [React Guide](../../../examples/react/README.md) |
+| **Express.js** | JavaScript/TypeScript | Middleware chain, routes | [Node.js Guide](../../../examples/node-webapp/README.md) |
+| **Java Servlet** | Java | MVC Model 2, filters | [Java Servlet Guide](../../../examples/java-webapp/README.md) |
+| **Python ETL** | Python | Data pipelines, transformations | [Python ETL Guide](../../../examples/python-etl/README.md) |
 
 ---
 
@@ -131,7 +131,7 @@ graph TB
     Generate --> Validate[Validate Syntax]
     Validate --> Done([Complete])
 
-    classDef guide fill:#4ECDC4,stroke:#0B7285,color:#fff
+    classDef guide fill:#4ECDC4,stroke:#0B7285,color:#000
     classDef process fill:#FFE66D,stroke:#F08C00,color:#000
 
     class SpringGuide,FastAPIGuide,ReactGuide,ExpressGuide,ServletGuide,ETLGuide guide
@@ -217,7 +217,7 @@ sequenceDiagram
     Controller-->>-Client: 200 OK + JSON
 ```
 
-**Full Guide:** [Spring Boot Examples](../../examples/spring-boot/README.md)
+**Full Guide:** [Spring Boot Examples](../../../examples/spring-boot/README.md)
 
 ---
 
@@ -284,7 +284,7 @@ sequenceDiagram
     Endpoint-->>-Client: 201 Created + JSON
 ```
 
-**Full Guide:** [FastAPI Examples](../../examples/fastapi/README.md)
+**Full Guide:** [FastAPI Examples](../../../examples/fastapi/README.md)
 
 ---
 
@@ -353,7 +353,7 @@ sequenceDiagram
     Component->>User: Render ContactTable
 ```
 
-**Full Guide:** [React Examples](../../examples/react/README.md)
+**Full Guide:** [React Examples](../../../examples/react/README.md)
 
 ---
 
@@ -404,7 +404,7 @@ flowchart TD
     Auth -->|Invalid| Return401[❌ 401 Unauthorized]
     Auth -->|Valid| RouteHandler[📝 Route Handler<br/>POST /contacts]
 
-    RouteHandler --> Service[⚙️ Contact Service<br/>create(data)]
+    RouteHandler --> Service["⚙️ Contact Service<br/>create(data)"]
     Service --> Success[✅ 201 Created]
 
     Return429 --> End([Response])
@@ -412,7 +412,7 @@ flowchart TD
     Success --> End
 ```
 
-**Full Guide:** [Node.js/Express Examples](../../examples/node-webapp/README.md)
+**Full Guide:** [Node.js/Express Examples](../../../examples/node-webapp/README.md)
 
 ---
 
@@ -469,7 +469,7 @@ graph TB
     AuthFilter --> ContactServlet
 ```
 
-**Full Guide:** [Java Servlet Examples](../../examples/java-webapp/README.md)
+**Full Guide:** [Java Servlet Examples](../../../examples/java-webapp/README.md)
 
 ---
 
@@ -540,7 +540,7 @@ flowchart LR
     Success --> End2([Pipeline Success])
 ```
 
-**Full Guide:** [Python ETL Examples](../../examples/python-etl/README.md)
+**Full Guide:** [Python ETL Examples](../../../examples/python-etl/README.md)
 
 ---
 
@@ -576,7 +576,7 @@ graph TD
     ER --> LoadFramework[Load Framework Example]
 
     classDef decision fill:#FFE66D,stroke:#F08C00,color:#000
-    classDef diagram fill:#4ECDC4,stroke:#0B7285,color:#fff
+    classDef diagram fill:#4ECDC4,stroke:#0B7285,color:#000
     classDef guide fill:#95E1D3,stroke:#087F5B,color:#000
 
     class Type decision
@@ -670,7 +670,7 @@ Don't try to diagram everything at once:
 ### 2. **Use Framework Examples as Templates**
 
 Don't reinvent patterns. If you're analyzing a Spring Boot app:
-1. Load [Spring Boot Guide](../../examples/spring-boot/README.md)
+1. Load [Spring Boot Guide](../../../examples/spring-boot/README.md)
 2. Find similar code patterns
 3. Adapt the Mermaid template to your specific code
 
@@ -823,7 +823,7 @@ flowchart TD
     Approved -->|Yes| Document[📄 Add to Documentation]
     Document --> Done([✅ Complete])
 
-    classDef process fill:#4ECDC4,stroke:#0B7285,color:#fff
+    classDef process fill:#4ECDC4,stroke:#0B7285,color:#000
     classDef decision fill:#FFE66D,stroke:#F08C00,color:#000
     classDef diagram fill:#95E1D3,stroke:#087F5B,color:#000
     classDef done fill:#A8DADC,stroke:#1864AB,color:#000
@@ -857,12 +857,12 @@ flowchart TD
 - [Deployment Diagrams Guide](../diagrams/deployment-diagrams.md)
 - [Sequence Diagrams Guide](../diagrams/sequence-diagrams.md)
 - [Unicode Symbols Reference](../unicode-symbols/guide.md)
-- [Spring Boot Examples](../../examples/spring-boot/README.md)
-- [FastAPI Examples](../../examples/fastapi/README.md)
-- [React Examples](../../examples/react/README.md)
-- [Node.js Examples](../../examples/node-webapp/README.md)
-- [Java Servlet Examples](../../examples/java-webapp/README.md)
-- [Python ETL Examples](../../examples/python-etl/README.md)
+- [Spring Boot Examples](../../../examples/spring-boot/README.md)
+- [FastAPI Examples](../../../examples/fastapi/README.md)
+- [React Examples](../../../examples/react/README.md)
+- [Node.js Examples](../../../examples/node-webapp/README.md)
+- [Java Servlet Examples](../../../examples/java-webapp/README.md)
+- [Python ETL Examples](../../../examples/python-etl/README.md)
 
 ---
 

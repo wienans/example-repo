@@ -460,6 +460,6 @@ spring-analyzer --input src/ --output diagrams/ --format mermaid
 
 ## See Also
 
-- [FastAPI Example](../fastapi/) - Python microservice patterns
-- [React Example](../react/) - Frontend architecture
-- [Node.js Example](../node-webapp/) - Node.js backend patterns
+- [FastAPI Example](fastapi/) - Python microservice patterns
+- [React Example](react/) - Frontend architecture
+- [Node.js Example](node-webapp/) - Node.js backend patterns

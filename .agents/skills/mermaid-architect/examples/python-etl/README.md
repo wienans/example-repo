@@ -248,7 +248,7 @@ flowchart TD
 
     SchemaValid -->|Yes| CleanData[🔄 Clean Data<br/>Remove Nulls<br/>Deduplicate]
 
-    CleanData --> Aggregate[📊 Aggregate Sales<br/>GROUP BY product, date<br/>SUM(amount)]
+    CleanData --> Aggregate["📊 Aggregate Sales<br/>GROUP BY product, date<br/>SUM(amount)"]
 
     Aggregate --> Enrich[🎨 Enrich Data<br/>JOIN with products<br/>Add metadata]
 
@@ -452,7 +452,7 @@ graph TB
 
         subgraph "Source Systems"
             ProdDB[(💾 Production DB<br/>PostgreSQL<br/>Read Replica)]
-            SalesAPI[🌐 Sales API<br/>REST Endpoint<br/>Rate Limited)]
+            SalesAPI[🌐 Sales API<br/>REST Endpoint<br/>Rate Limited]
             S3Source[📦 S3 Raw Data<br/>s3://raw-data/<br/>CSV, JSON, Parquet]
         end
 
@@ -476,7 +476,7 @@ graph TB
 
         subgraph "Metadata & Config"
             MetaDB[(💾 Airflow Metadata<br/>PostgreSQL<br/>Task History)]
-            ConfigStore[📦 Config Store<br/>AWS Secrets Manager<br/>Connection Strings)]
+            ConfigStore[📦 Config Store<br/>AWS Secrets Manager<br/>Connection Strings]
         end
     end
 

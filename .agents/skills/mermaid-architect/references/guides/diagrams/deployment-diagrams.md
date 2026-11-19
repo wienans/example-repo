@@ -107,7 +107,7 @@ graph TB
 ```mermaid
 graph TB
     subgraph "Kubernetes Cluster"
-        subgraph "Ingress"
+        subgraph IngressLayer ["Ingress"]
             Ingress[🌐 NGINX Ingress<br/>ingress-nginx]
         end
 

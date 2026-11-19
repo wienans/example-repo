@@ -203,7 +203,7 @@ flowchart TD
 
     CORS --> Morgan[📝 Morgan<br/>HTTP Logging<br/>combined format]
 
-    Morgan --> BodyParser[📄 Body Parser<br/>express.json()<br/>express.urlencoded()]
+    Morgan --> BodyParser["📄 Body Parser<br/>express.json()<br/>express.urlencoded()"]
 
     BodyParser --> RequestID[🏷️ Request ID<br/>Add unique ID<br/>X-Request-ID header]
 
@@ -357,11 +357,6 @@ sequenceDiagram
 
     Email->>+SMTP: Send email via Nodemailer
     SMTP-->>-Email: Email sent
-
-    classDef client fill:#FFE4B5,stroke:#333,stroke-width:2px,color:black
-    classDef middleware fill:#F0E68C,stroke:#333,stroke-width:2px,color:black
-    classDef controller fill:#90EE90,stroke:#333,stroke-width:2px,color:darkgreen
-    classDef database fill:#E6E6FA,stroke:#333,stroke-width:2px,color:darkblue
 ```
 
 ### Deployment Diagram (PM2 Cluster + Docker)

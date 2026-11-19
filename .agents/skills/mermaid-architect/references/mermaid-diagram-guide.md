@@ -151,6 +151,7 @@ classDiagram
     Dog "1" --> "*" Toy : has
     Cat "1" --> "1" Owner : belongs to
 
+    class Flyable
     <<interface>> Flyable
     Bird ..|> Flyable : implements
 ```
@@ -426,7 +427,7 @@ graph LR
     style A fill:#F0F0F0,stroke:#333,color:black
     style B fill:#90EE90,stroke:#333,color:darkgreen
     style C fill:#FFD700,stroke:#333,color:black
-    style D fill:#FF6B6B,stroke:#8B0000,color:white
+    style D fill:#FF6B6B,stroke:#8B0000,color:#000
 ```
 
 **Using classDef (Recommended for consistency)**:
@@ -451,7 +452,7 @@ graph LR
 
 ❌ **Incorrect - Poor Contrast**:
 
-```mermaid
+```text
 graph LR
     %% Missing color property - may be unreadable
     style B fill:#90EE90
@@ -474,16 +475,24 @@ graph LR
 
 ### Link Styles
 
+Give each edge an ID, then style the ID with an edge class. The style stays on its edge when you add or reorder edges.
+
 ```mermaid
 graph LR
-    A --> B
-    A -.-> C
-    A ==> D
+    classDef edgeOk stroke:#2E7D2E,stroke-width:2px,color:black
+    classDef edgeAsync stroke:#1565C0,stroke-width:2px,color:black
+    classDef edgeHot stroke:#C62828,stroke-width:4px,color:black
 
-    linkStyle 0 stroke:#00ff00,stroke-width:2px
-    linkStyle 1 stroke:#0000ff,stroke-width:2px
-    linkStyle 2 stroke:#ff0000,stroke-width:4px
+    A e1@--> B
+    A e2@-.-> C
+    A e3@==> D
+
+    class e1 edgeOk
+    class e2 edgeAsync
+    class e3 edgeHot
 ```
+
+Edge IDs need Mermaid 11.6 or later. For an older renderer, `linkStyle 0 stroke:#2E7D2E` styles edges by their position in the source, which shifts when an edge is added.
 
 ---
 

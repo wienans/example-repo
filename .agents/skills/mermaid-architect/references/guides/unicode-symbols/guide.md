@@ -284,7 +284,8 @@ graph LR
 ```mermaid
 graph LR
     A[⚙️ Service A] --> B[💾 Database]
-    C[🔧 Service B] --> B  %% Different symbol for same concept
+    %% Different symbol for same concept
+    C[🔧 Service B] --> B
 ```
 
 ### 2. Don't Overuse Symbols
@@ -301,7 +302,8 @@ graph LR
 ❌ **Bad - Too Many:**
 ```mermaid
 graph LR
-    A[🔐🔑🛡️👤 Auth Service]  %% Cluttered
+    %% Cluttered
+    A[🔐🔑🛡️👤 Auth Service]
 ```
 
 ### 3. Combine with Text
@@ -317,7 +319,8 @@ graph LR
 ❌ **Bad:**
 ```mermaid
 graph LR
-    A[💰💳🏦]  %% No context
+    %% No context
+    A[💰💳🏦]
 ```
 
 ### 4. Consider Rendering Context
@@ -339,13 +342,15 @@ Remember that some users may use screen readers. The text should make sense with
 ✅ **Good:**
 ```mermaid
 graph LR
-    A[🔐 Authentication Service]  %% "Authentication Service" is clear
+    %% "Authentication Service" is clear
+    A[🔐 Authentication Service]
 ```
 
 ❌ **Bad:**
 ```mermaid
 graph LR
-    A[🔐]  %% Screen reader only says "lock"
+    %% Screen reader only says "lock"
+    A[🔐]
 ```
 
 ## Symbol Combinations
