@@ -46,8 +46,10 @@ Every UID ends in FULL, PARTIAL or NONE, which tools/strictdoc/site.css
 colours green, amber or red.
 
 Run: make docs
-Output: build/coverage/coverage.sdoc. StrictDoc renders it as
-html/coverage/coverage.html, and gcovr's HTML goes to html/coverage/gcovr/.
+Output: docs/generated/coverage.sdoc (git ignores it; see
+test_results_to_sdoc.py for why it lives there). StrictDoc renders it as
+html/<checkout>/docs/generated/coverage.html, and make docs copies gcovr's HTML
+to the gcovr/ folder next to it.
 """
 
 import dataclasses
@@ -59,9 +61,11 @@ import sys
 from source_markers import ROOT, read_markers
 
 GCOVR_JSON = ROOT / "build" / "ceedling" / "artifacts" / "gcov" / "gcovr" / "GcovCoverage.json"
-OUT = ROOT / "build" / "coverage" / "coverage.sdoc"
-# gcovr's HTML, relative to the rendered page html/coverage/coverage.html.
-GCOVR_HTML = "gcovr"
+OUT = ROOT / "docs" / "generated" / "coverage.sdoc"
+# gcovr's HTML. StrictDoc also shows coverage nodes on the requirement pages,
+# so the link climbs to docs/ first: it resolves from docs/generated/ and from
+# docs/requirements/, which sit at the same depth.
+GCOVR_HTML = "../generated/gcovr"
 GCOVR_PREFIX = "GcovCoverageResults"
 
 HEADER = """\

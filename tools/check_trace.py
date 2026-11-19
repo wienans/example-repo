@@ -25,7 +25,7 @@ checks the other direction. It fails when:
 - a software requirement has no ``Implementation`` marker. A requirement that a
   ``Check`` verifies is exempt, because it constrains every source file rather
   than naming one,
-- a file in ``docs/requirements/software/`` is not included by
+- a ``docs/requirements/software_*.sdoc`` domain file is not included by
   ``software_requirements.sdoc``, because StrictDoc would silently leave it out.
 
 This script checks traceability, not layering or determinism, so it carries no
@@ -40,9 +40,12 @@ import xml.etree.ElementTree as ET
 
 from source_markers import ROOT, Marker, read_markers
 
-# PARENT includes one file per domain from REQUIREMENTS_DIR.
+# PARENT includes one software_<domain>.sdoc per domain from its own folder.
+# StrictDoc links a requirement to its code from the depth of the file that
+# defines it, so the domain files sit next to PARENT, not in a subfolder.
 PARENT = ROOT / "docs" / "requirements" / "software_requirements.sdoc"
-REQUIREMENTS_DIR = ROOT / "docs" / "requirements" / "software"
+REQUIREMENTS_DIR = PARENT.parent
+DOMAIN_GLOB = "software_*.sdoc"
 JUNIT_REPORT = ROOT / "build" / "ceedling" / "artifacts" / "test" / "junit_tests_report.xml"
 # A report older than any of these files does not describe the current code.
 REPORT_INPUTS = [ROOT / "src", ROOT / "tests", ROOT / "project.yml"]
@@ -57,12 +60,16 @@ def unincluded_files() -> list[pathlib.Path]:
         (PARENT.parent / f).resolve()
         for f in INCLUDE.findall(PARENT.read_text(encoding="utf-8"))
     }
-    return [p for p in sorted(REQUIREMENTS_DIR.glob("*.sdoc")) if p.resolve() not in included]
+    return [p for p in domain_files() if p.resolve() not in included]
+
+
+def domain_files() -> list[pathlib.Path]:
+    return [p for p in sorted(REQUIREMENTS_DIR.glob(DOMAIN_GLOB)) if p != PARENT]
 
 
 def defined_uids() -> dict[str, pathlib.Path]:
     found: dict[str, pathlib.Path] = {}
-    for path in sorted(REQUIREMENTS_DIR.glob("*.sdoc")):
+    for path in domain_files():
         for uid in UID_LINE.findall(path.read_text(encoding="utf-8")):
             found[uid] = path
     return found

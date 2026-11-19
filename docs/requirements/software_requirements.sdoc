@@ -27,25 +27,25 @@ the direction of rotation.
 [[/SECTION]]
 
 [DOCUMENT_FROM_FILE]
-FILE: software/pi_controller.sdoc
+FILE: software_pi_controller.sdoc
 
 [DOCUMENT_FROM_FILE]
-FILE: software/motor_state_machine.sdoc
+FILE: software_motor_state_machine.sdoc
 
 [DOCUMENT_FROM_FILE]
-FILE: software/fault_monitor.sdoc
+FILE: software_fault_monitor.sdoc
 
 [DOCUMENT_FROM_FILE]
-FILE: software/motor_control.sdoc
+FILE: software_motor_control.sdoc
 
 [DOCUMENT_FROM_FILE]
-FILE: software/scheduler.sdoc
+FILE: software_scheduler.sdoc
 
 [DOCUMENT_FROM_FILE]
-FILE: software/board_support_package.sdoc
+FILE: software_board_support_package.sdoc
 
 [DOCUMENT_FROM_FILE]
-FILE: software/application.sdoc
+FILE: software_application.sdoc
 
 [DOCUMENT_FROM_FILE]
-FILE: software/architecture_constraints.sdoc
+FILE: software_architecture_constraints.sdoc

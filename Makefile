@@ -46,17 +46,23 @@ diagrams:
 #   build that no longer compiles.
 # - StrictDoc only rewrites a page whose own inputs changed, so a requirement
 #   page would keep stale result links: the site starts from scratch too.
-# - The generated documents live in build/, which StrictDoc's .gitignore
-#   filter skips, so they are passed as input paths of their own.
+# - The generated documents go to docs/generated/, at the depth of
+#   docs/requirements/. StrictDoc builds a requirement's links to code from
+#   the depth of its own document, so a document at another depth, or a
+#   second export input path, gets broken links. Git ignores them through
+#   docs/generated/.gitignore; StrictDoc reads only the root .gitignore.
+# - StrictDoc puts the documents under a folder named after the checkout.
+GENERATED_DOCS := docs/generated
+SITE_DOCS      := build/strictdoc/html/$(notdir $(CURDIR))/$(GENERATED_DOCS)
 docs: diagrams
-	rm -rf build/ceedling/gcov build/ceedling/artifacts/gcov build/strictdoc
+	rm -rf build/ceedling/gcov build/ceedling/artifacts/gcov build/strictdoc $(GENERATED_DOCS)/*.sdoc
 	-$(CEEDLING) gcov:all
 	$(PYTHON) tools/test_results_to_sdoc.py
 	$(PYTHON) tools/coverage_to_sdoc.py
 	$(DOXYGEN) docs/Doxyfile
-	$(STRICTDOC) export . build/test_results/test_results.sdoc build/coverage/coverage.sdoc --output-dir build/strictdoc
-	mkdir -p build/strictdoc/html/coverage/gcovr
-	-cp build/ceedling/artifacts/gcov/gcovr/GcovCoverageResults* build/strictdoc/html/coverage/gcovr/
+	$(STRICTDOC) export . --output-dir build/strictdoc
+	mkdir -p $(SITE_DOCS)/gcovr
+	-cp build/ceedling/artifacts/gcov/gcovr/GcovCoverageResults* $(SITE_DOCS)/gcovr/
 
 clean:
-	rm -rf build
+	rm -rf build $(GENERATED_DOCS)/*.sdoc

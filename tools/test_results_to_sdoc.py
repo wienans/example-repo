@@ -20,7 +20,7 @@ not stop the build. ``make trace`` is the gate that fails on it.
 Each TEST_RESULT UID ends in its status, for tools/strictdoc/site.css.
 
 Run: make docs
-Output: build/test_results/test_results.sdoc
+Output: docs/generated/test_results.sdoc (git ignores it)
 """
 
 import dataclasses
@@ -33,10 +33,12 @@ from source_markers import ROOT, read_markers
 
 # make docs runs the suite once, under gcov; that run writes this report.
 JUNIT_REPORT = ROOT / "build" / "ceedling" / "artifacts" / "gcov" / "junit_tests_report.xml"
-# StrictDoc excludes every .gitignore entry, so build/ is never scanned. Pass
-# this file to strictdoc export as its own input path instead: a single-file
-# input skips the include and exclude filters.
-OUT = ROOT / "build" / "test_results" / "test_results.sdoc"
+# StrictDoc excludes every root .gitignore entry, so build/ is never scanned,
+# and a second export input path breaks the links from requirements to code.
+# docs/generated/ keeps its own .gitignore, which StrictDoc does not read. It
+# sits at the depth of docs/requirements/: StrictDoc links a requirement to
+# its code from the depth of the document it is shown in.
+OUT = ROOT / "docs" / "generated" / "test_results.sdoc"
 
 # StrictDoc's own label pair for tests. "satisfies" would claim a failed test
 # satisfies its requirement.
