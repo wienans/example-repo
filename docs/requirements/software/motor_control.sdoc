@@ -1,6 +1,9 @@
 [DOCUMENT]
 TITLE: Domain: motor control
 
+[GRAMMAR]
+IMPORT_FROM_FILE: software_requirements.sgra
+
 [REQUIREMENT]
 UID: SWR-CTL-001
 TITLE: Setpoint clamp and ramp

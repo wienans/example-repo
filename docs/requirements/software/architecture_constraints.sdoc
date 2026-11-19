@@ -1,6 +1,9 @@
 [DOCUMENT]
 TITLE: Architecture constraints
 
+[GRAMMAR]
+IMPORT_FROM_FILE: software_requirements.sgra
+
 [REQUIREMENT]
 UID: SWR-ARC-001
 TITLE: Layer include rule

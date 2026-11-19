@@ -1,6 +1,9 @@
 [DOCUMENT]
 TITLE: Domain: motor state machine
 
+[GRAMMAR]
+IMPORT_FROM_FILE: software_requirements.sgra
+
 [REQUIREMENT]
 UID: SWR-FSM-001
 TITLE: Motor states

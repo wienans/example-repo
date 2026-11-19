@@ -1,6 +1,9 @@
 [DOCUMENT]
 TITLE: Middleware: scheduler
 
+[GRAMMAR]
+IMPORT_FROM_FILE: software_requirements.sgra
+
 [REQUIREMENT]
 UID: SWR-SCH-001
 TITLE: Fixed-period cooperative scheduling

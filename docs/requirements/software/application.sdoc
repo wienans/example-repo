@@ -1,6 +1,9 @@
 [DOCUMENT]
 TITLE: Application
 
+[GRAMMAR]
+IMPORT_FROM_FILE: software_requirements.sgra
+
 [REQUIREMENT]
 UID: SWR-APP-001
 TITLE: Task periods

@@ -1,6 +1,9 @@
 [DOCUMENT]
 TITLE: Domain: PI controller
 
+[GRAMMAR]
+IMPORT_FROM_FILE: software_requirements.sgra
+
 [REQUIREMENT]
 UID: SWR-PI-001
 TITLE: Proportional-integral output

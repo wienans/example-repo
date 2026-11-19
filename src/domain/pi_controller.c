@@ -50,15 +50,10 @@ int32_t pi_step(pi_controller_t *pi, int32_t error)
     const int64_t out_min = pi->cfg.out_min;
     const int64_t out_max = pi->cfg.out_max;
     const int64_t proportional = (int64_t)pi->cfg.kp_q8 * error;
-    /*
-     * Accumulate Ki * e, held within the output limits.
-     * @relation(SWR-PI-001, SWR-PI-002, scope=range_start, role=Implementation)
-     */
+    /* Accumulate Ki * e, held within the output limits.
+     * @relation(SWR-PI-001, SWR-PI-002, scope=line, role=Implementation) */
     const int64_t integrated = clamp64((int64_t)pi->integrator + (int64_t)pi->cfg.ki_q8 * error,
                                        out_min * Q8_ONE, out_max * Q8_ONE);
-    /*
-     * @relation(SWR-PI-001, SWR-PI-002, scope=range_end, role=Implementation)
-     */
     const int64_t unclamped = (proportional + integrated) / Q8_ONE;
 
     /*

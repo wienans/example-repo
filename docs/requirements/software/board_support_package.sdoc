@@ -1,6 +1,9 @@
 [DOCUMENT]
 TITLE: Board support package
 
+[GRAMMAR]
+IMPORT_FROM_FILE: software_requirements.sgra
+
 [REQUIREMENT]
 UID: SWR-BSP-001
 TITLE: Encoder speed conversion
