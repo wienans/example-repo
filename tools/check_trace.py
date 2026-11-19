@@ -3,7 +3,8 @@
 
 Code and tests name a requirement with a StrictDoc marker that carries a role:
 
-- ``role=Implementation`` in ``src/``: the function implements the requirement.
+- ``role=Implementation`` in ``src/``: the function, range or line implements
+  the requirement.
 - ``role=Test`` in ``tests/``: the unit test verifies it.
 - ``role=Check`` in ``tools/``: a static check verifies it over the whole tree.
 
@@ -15,7 +16,9 @@ report that Ceedling's ``report_tests_log_factory`` plugin writes, so run
 StrictDoc already rejects markers that name an unknown UID, so this script
 checks the other direction. It fails when:
 
-- a marker under one of those directories lacks the role that directory needs,
+- a marker is malformed: it lacks the role its directory needs, sits in a
+  one-line ``/* */`` comment StrictDoc ignores, or is a ``scope=function``
+  marker not right above a function (see ``source_markers.py``),
 - a ``Test`` marker does not sit on a ``test_*`` function,
 - the JUnit report is missing, or older than a file under ``src/`` or ``tests/``,
 - a software requirement has no passing ``Test`` and no ``Check``,
@@ -30,45 +33,22 @@ marker of its own. A marker here would count as evidence for a requirement it
 does not verify.
 """
 
-import dataclasses
 import pathlib
 import re
 import sys
 import xml.etree.ElementTree as ET
 
-ROOT = pathlib.Path(__file__).resolve().parent.parent
+from source_markers import ROOT, Marker, read_markers
+
 # PARENT includes one file per domain from REQUIREMENTS_DIR.
 PARENT = ROOT / "docs" / "requirements" / "software_requirements.sdoc"
 REQUIREMENTS_DIR = ROOT / "docs" / "requirements" / "software"
-# The role every marker in a directory must carry.
-ROLE_BY_DIR = {
-    ROOT / "src": "Implementation",
-    ROOT / "tests": "Test",
-    ROOT / "tools": "Check",
-}
-MARKED_SUFFIXES = {".c", ".h", ".py"}
 JUNIT_REPORT = ROOT / "build" / "ceedling" / "artifacts" / "test" / "junit_tests_report.xml"
 # A report older than any of these files does not describe the current code.
 REPORT_INPUTS = [ROOT / "src", ROOT / "tests", ROOT / "project.yml"]
 
 UID_LINE = re.compile(r"^UID:\s*(SWR-[A-Z]+-\d+)\s*$", re.MULTILINE)
-RELATION = re.compile(r"@relation\(([^)]*)\)")
 INCLUDE = re.compile(r"^\[DOCUMENT_FROM_FILE\]\nFILE:\s*(\S+)\s*$", re.MULTILINE)
-# The rest of the comment that holds the marker, then the test function it documents.
-TEST_FUNCTION_AFTER_MARKER = re.compile(r"[^\n]*\n(?:[ \t]*\*[^/\n][^\n]*\n|[ \t]*\*\n)*[ \t]*\*/\s*\nvoid\s+(test_\w+)\s*\(")
-
-
-@dataclasses.dataclass
-class Marker:
-    path: pathlib.Path
-    line: int
-    role: str
-    uids: list[str]
-    test: str | None = None  # the test function a Test marker documents
-
-    @property
-    def where(self) -> str:
-        return f"{self.path.relative_to(ROOT)}:{self.line}"
 
 
 def unincluded_files() -> list[pathlib.Path]:
@@ -89,33 +69,15 @@ def defined_uids() -> dict[str, pathlib.Path]:
 
 
 def collect_markers() -> tuple[list[Marker], list[str]]:
-    """Every marker that names a software requirement, and the markers that are malformed."""
-    markers: list[Marker] = []
-    errors: list[str] = []
-    for directory, expected in ROLE_BY_DIR.items():
-        for path in sorted(directory.rglob("*")):
-            if path.suffix not in MARKED_SUFFIXES:
-                continue
-            text = path.read_text(encoding="utf-8")
-            for match in RELATION.finditer(text):
-                args = [a.strip() for a in match.group(1).split(",")]
-                uids = [a for a in args if a.startswith("SWR-")]
-                if not uids:
-                    continue
-                roles = [a.removeprefix("role=") for a in args if a.startswith("role=")]
-                marker = Marker(path, text.count("\n", 0, match.start()) + 1, roles[0] if roles else "", uids)
-                if marker.role != expected:
-                    has = f"role={marker.role}" if marker.role else "no role"
-                    errors.append(f"{marker.where}: marker needs role={expected}, has {has}")
-                    continue
-                if marker.role == "Test":
-                    function = TEST_FUNCTION_AFTER_MARKER.match(text, match.end())
-                    if function is None:
-                        errors.append(f"{marker.where}: Test marker is not on a test_* function")
-                        continue
-                    marker.test = function.group(1)
-                markers.append(marker)
-    return markers, errors
+    """The markers, plus problems: malformed markers and Test markers off a test function."""
+    markers, errors = read_markers()
+    kept: list[Marker] = []
+    for marker in markers:
+        if marker.role == "Test" and not marker.function.startswith("test_"):
+            errors.append(f"{marker.where}: Test marker is not on a test_* function")
+            continue
+        kept.append(marker)
+    return kept, errors
 
 
 def newest_input() -> pathlib.Path:
@@ -170,12 +132,12 @@ def main() -> int:
         if marker.role == "Check":
             verified.update(marker.uids)
         if marker.role == "Test":
-            outcome = results.get((str(marker.path.relative_to(ROOT)), marker.test), "not run")
+            outcome = results.get((marker.file, marker.function), "not run")
             if outcome == "passed":
                 verified.update(marker.uids)
             else:
                 for uid in marker.uids:
-                    unproven.setdefault(uid, []).append(f"{marker.test} {outcome}")
+                    unproven.setdefault(uid, []).append(f"{marker.function} {outcome}")
 
     # Without a usable report every test reads "not run". The report error is the
     # one cause, so it stands alone instead of one line per requirement.
