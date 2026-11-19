@@ -7,7 +7,7 @@ void tearDown(void) {}
 
 /**
  * @brief The expected values below assume this board's scaling.
- * @relation(SWR-BSP-001, SWR-BSP-002, scope=function)
+ * @relation(SWR-BSP-001, SWR-BSP-002, scope=function, role=Test)
  */
 void test_board_scaling_premise(void)
 {
@@ -17,7 +17,7 @@ void test_board_scaling_premise(void)
 
 /**
  * @brief Counter difference is signed and survives wraps in both directions.
- * @relation(SWR-BSP-001, scope=function)
+ * @relation(SWR-BSP-001, scope=function, role=Test)
  */
 void test_encoder_delta_is_wrap_safe(void)
 {
@@ -31,7 +31,7 @@ void test_encoder_delta_is_wrap_safe(void)
 
 /**
  * @brief A quarter revolution per sample period of 1 ms is 15000 rpm; fractions truncate toward zero.
- * @relation(SWR-BSP-001, scope=function)
+ * @relation(SWR-BSP-001, scope=function, role=Test)
  */
 void test_counts_to_rpm(void)
 {
@@ -45,7 +45,7 @@ void test_counts_to_rpm(void)
 
 /**
  * @brief Mid-scale is 0 mA; each count is 3300 mV / 4096 at 100 mV/A.
- * @relation(SWR-BSP-002, scope=function)
+ * @relation(SWR-BSP-002, scope=function, role=Test)
  */
 void test_adc_to_milliamp(void)
 {

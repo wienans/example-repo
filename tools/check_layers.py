@@ -9,7 +9,7 @@ dynamic memory and floating point are rejected.
 
 Exit 0 when clean, 1 with "path:line: message" lines otherwise.
 
-@relation(SWR-ARC-001, SWR-DET-001, scope=file)
+@relation(SWR-ARC-001, SWR-DET-001, scope=file, role=Check)
 """
 
 import re

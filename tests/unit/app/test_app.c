@@ -74,7 +74,7 @@ void tearDown(void) {}
 
 /**
  * @brief The control task runs every 1 ms and the UI task every 10 ms.
- * @relation(SWR-APP-001, scope=function)
+ * @relation(SWR-APP-001, scope=function, role=Test)
  */
 void test_task_rates(void)
 {
@@ -87,7 +87,7 @@ void test_task_rates(void)
 
 /**
  * @brief Polling without time passing runs nothing.
- * @relation(SWR-APP-001, scope=function)
+ * @relation(SWR-APP-001, scope=function, role=Test)
  */
 void test_poll_without_elapsed_time_runs_nothing(void)
 {
@@ -100,7 +100,7 @@ void test_poll_without_elapsed_time_runs_nothing(void)
 
 /**
  * @brief The drive stays off until START.
- * @relation(SWR-APP-001, SWR-CTL-002, scope=function)
+ * @relation(SWR-APP-001, SWR-CTL-002, scope=function, role=Test)
  */
 void test_drive_off_before_start(void)
 {
@@ -112,7 +112,7 @@ void test_drive_off_before_start(void)
 
 /**
  * @brief A start-button press starts the motor toward the configured setpoint.
- * @relation(SWR-APP-002, scope=function)
+ * @relation(SWR-APP-002, scope=function, role=Test)
  */
 void test_start_edge_runs_toward_configured_setpoint(void)
 {
@@ -129,7 +129,7 @@ void test_start_edge_runs_toward_configured_setpoint(void)
 
 /**
  * @brief A held button produces one event, not one per UI run.
- * @relation(SWR-APP-002, scope=function)
+ * @relation(SWR-APP-002, scope=function, role=Test)
  */
 void test_held_start_triggers_once(void)
 {
@@ -145,7 +145,7 @@ void test_held_start_triggers_once(void)
 
 /**
  * @brief A start button already held at boot does not start the motor.
- * @relation(SWR-APP-002, scope=function)
+ * @relation(SWR-APP-002, scope=function, role=Test)
  */
 void test_start_held_at_boot_is_not_an_edge(void)
 {
@@ -157,7 +157,7 @@ void test_start_held_at_boot_is_not_an_edge(void)
 
 /**
  * @brief A stop-button press stops a running motor.
- * @relation(SWR-APP-002, scope=function)
+ * @relation(SWR-APP-002, scope=function, role=Test)
  */
 void test_stop_edge_stops(void)
 {
@@ -171,7 +171,7 @@ void test_stop_edge_stops(void)
 
 /**
  * @brief In FAULT, start is ignored and a stop-button press clears the fault.
- * @relation(SWR-APP-002, SWR-CTL-004, scope=function)
+ * @relation(SWR-APP-002, SWR-CTL-004, scope=function, role=Test)
  */
 void test_stop_edge_clears_fault(void)
 {

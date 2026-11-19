@@ -13,7 +13,7 @@
  * application never starts.
  *
  * @return Never returns.
- * @relation(SWR-BSP-004, SWR-APP-001, scope=function)
+ * @relation(SWR-BSP-004, SWR-APP-001, scope=function, role=Implementation)
  */
 int main(void)
 {

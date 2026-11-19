@@ -13,7 +13,7 @@
 
 /**
  * @brief Wrap-safe signed counter difference.
- * @relation(SWR-BSP-001, scope=function)
+ * @relation(SWR-BSP-001, scope=function, role=Implementation)
  */
 int32_t bsp_encoder_delta(uint16_t previous, uint16_t current)
 {
@@ -25,7 +25,7 @@ int32_t bsp_encoder_delta(uint16_t previous, uint16_t current)
 
 /**
  * @brief Counts per sample period to rpm.
- * @relation(SWR-BSP-001, scope=function)
+ * @relation(SWR-BSP-001, scope=function, role=Implementation)
  */
 rpm_t bsp_counts_to_rpm(int32_t delta_counts)
 {
@@ -35,7 +35,7 @@ rpm_t bsp_counts_to_rpm(int32_t delta_counts)
 
 /**
  * @brief ADC counts to milliamperes.
- * @relation(SWR-BSP-002, scope=function)
+ * @relation(SWR-BSP-002, scope=function, role=Implementation)
  */
 milliamp_t bsp_adc_to_ma(uint16_t raw)
 {

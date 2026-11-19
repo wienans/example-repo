@@ -22,7 +22,7 @@ static int32_t clamp32(int32_t value, int32_t lo, int32_t hi)
 
 /**
  * @brief Initialise to IDLE with a zero setpoint and no faults.
- * @relation(SWR-FSM-001, SWR-CTL-002, scope=function)
+ * @relation(SWR-FSM-001, SWR-CTL-002, scope=function, role=Implementation)
  */
 void motor_control_init(motor_control_t *mc, const motor_control_config_t *cfg)
 {
@@ -39,7 +39,7 @@ void motor_control_init(motor_control_t *mc, const motor_control_config_t *cfg)
 
 /**
  * @brief Store the target speed clamped to the configured range.
- * @relation(SWR-CTL-001, scope=function)
+ * @relation(SWR-CTL-001, scope=function, role=Implementation)
  */
 void motor_control_set_speed(motor_control_t *mc, rpm_t rpm)
 {
@@ -48,7 +48,7 @@ void motor_control_set_speed(motor_control_t *mc, rpm_t rpm)
 
 /**
  * @brief Apply an event and run the entry and exit actions of the new state.
- * @relation(SWR-FSM-002, SWR-FSM-003, SWR-CTL-003, scope=function)
+ * @relation(SWR-FSM-002, SWR-FSM-003, SWR-CTL-003, scope=function, role=Implementation)
  */
 void motor_control_handle(motor_control_t *mc, motor_event_t event)
 {
@@ -69,7 +69,7 @@ void motor_control_handle(motor_control_t *mc, motor_event_t event)
 
 /**
  * @brief Check faults, then ramp the setpoint and run the PI while RUNNING.
- * @relation(SWR-CTL-001, SWR-CTL-002, SWR-CTL-004, scope=function)
+ * @relation(SWR-CTL-001, SWR-CTL-002, SWR-CTL-004, scope=function, role=Implementation)
  */
 drive_cmd_t motor_control_step(motor_control_t *mc, const motor_sample_t *sample)
 {
@@ -94,7 +94,7 @@ drive_cmd_t motor_control_step(motor_control_t *mc, const motor_sample_t *sample
 
 /**
  * @brief Current operating mode.
- * @relation(SWR-FSM-001, scope=function)
+ * @relation(SWR-FSM-001, scope=function, role=Implementation)
  */
 motor_state_t motor_control_state(const motor_control_t *mc)
 {
@@ -103,7 +103,7 @@ motor_state_t motor_control_state(const motor_control_t *mc)
 
 /**
  * @brief Latched faults.
- * @relation(SWR-CTL-004, scope=function)
+ * @relation(SWR-CTL-004, scope=function, role=Implementation)
  */
 fault_flags_t motor_control_faults(const motor_control_t *mc)
 {
@@ -112,7 +112,7 @@ fault_flags_t motor_control_faults(const motor_control_t *mc)
 
 /**
  * @brief Ramped setpoint.
- * @relation(SWR-CTL-001, scope=function)
+ * @relation(SWR-CTL-001, scope=function, role=Implementation)
  */
 rpm_t motor_control_setpoint(const motor_control_t *mc)
 {

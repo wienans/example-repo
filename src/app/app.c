@@ -42,7 +42,7 @@ static const motor_control_config_t k_motor_config = {
 /**
  * @brief Sample, step and apply.
  * @param ctx The app_t instance.
- * @relation(SWR-APP-001, scope=function)
+ * @relation(SWR-APP-001, scope=function, role=Implementation)
  */
 static void control_task(void *ctx)
 {
@@ -55,7 +55,7 @@ static void control_task(void *ctx)
 /**
  * @brief START on a start-button edge; STOP, or CLEAR_FAULT in FAULT, on a stop-button edge.
  * @param ctx The app_t instance.
- * @relation(SWR-APP-001, SWR-APP-002, scope=function)
+ * @relation(SWR-APP-001, SWR-APP-002, scope=function, role=Implementation)
  */
 static void ui_task(void *ctx)
 {
@@ -82,7 +82,7 @@ static sched_task_t s_tasks[] = {
 
 /**
  * @brief Configure the core, seed the button state and start the scheduler.
- * @relation(SWR-APP-001, SWR-APP-002, scope=function)
+ * @relation(SWR-APP-001, SWR-APP-002, scope=function, role=Implementation)
  */
 void app_init(void)
 {
@@ -96,7 +96,7 @@ void app_init(void)
 
 /**
  * @brief Run due tasks at the current time.
- * @relation(SWR-APP-001, scope=function)
+ * @relation(SWR-APP-001, scope=function, role=Implementation)
  */
 void app_poll(void)
 {
@@ -105,7 +105,7 @@ void app_poll(void)
 
 /**
  * @brief Snapshot for telemetry.
- * @relation(SWR-APP-001, scope=function)
+ * @relation(SWR-APP-001, scope=function, role=Implementation)
  */
 app_status_t app_status(void)
 {

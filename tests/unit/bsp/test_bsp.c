@@ -67,7 +67,7 @@ void tearDown(void) {}
 
 /**
  * @brief Successful init returns true and leaves the bridge disabled at 0 % duty.
- * @relation(SWR-BSP-004, scope=function)
+ * @relation(SWR-BSP-004, scope=function, role=Test)
  */
 void test_init_success_leaves_drive_disabled(void)
 {
@@ -78,7 +78,7 @@ void test_init_success_leaves_drive_disabled(void)
 
 /**
  * @brief A failure of any one HAL initialisation makes bsp_init return false.
- * @relation(SWR-BSP-004, scope=function)
+ * @relation(SWR-BSP-004, scope=function, role=Test)
  */
 void test_init_fails_when_any_hal_init_fails(void)
 {
@@ -95,7 +95,7 @@ void test_init_fails_when_any_hal_init_fails(void)
 
 /**
  * @brief Time comes from the HAL tick.
- * @relation(SWR-APP-001, scope=function)
+ * @relation(SWR-APP-001, scope=function, role=Test)
  */
 void test_millis_reads_hal_tick(void)
 {
@@ -105,7 +105,7 @@ void test_millis_reads_hal_tick(void)
 
 /**
  * @brief Speed is the counts since the previous sample, across a counter wrap.
- * @relation(SWR-BSP-001, scope=function)
+ * @relation(SWR-BSP-001, scope=function, role=Test)
  */
 void test_sample_speed_from_encoder_delta_across_wrap(void)
 {
@@ -124,7 +124,7 @@ void test_sample_speed_from_encoder_delta_across_wrap(void)
 
 /**
  * @brief Reverse rotation across the zero count gives negative speed.
- * @relation(SWR-BSP-001, scope=function)
+ * @relation(SWR-BSP-001, scope=function, role=Test)
  */
 void test_sample_reverse_speed_across_wrap(void)
 {
@@ -137,7 +137,7 @@ void test_sample_reverse_speed_across_wrap(void)
 
 /**
  * @brief Current comes from the current-sense ADC in mA.
- * @relation(SWR-BSP-002, scope=function)
+ * @relation(SWR-BSP-002, scope=function, role=Test)
  */
 void test_sample_current_from_adc(void)
 {
@@ -150,7 +150,7 @@ void test_sample_current_from_adc(void)
 
 /**
  * @brief Positive duty drives forward with |duty| on the PWM and the bridge enabled.
- * @relation(SWR-BSP-003, scope=function)
+ * @relation(SWR-BSP-003, scope=function, role=Test)
  */
 void test_apply_forward(void)
 {
@@ -162,7 +162,7 @@ void test_apply_forward(void)
 
 /**
  * @brief Negative duty drives in reverse with its magnitude on the PWM.
- * @relation(SWR-BSP-003, scope=function)
+ * @relation(SWR-BSP-003, scope=function, role=Test)
  */
 void test_apply_reverse(void)
 {
@@ -174,7 +174,7 @@ void test_apply_reverse(void)
 
 /**
  * @brief A disabled command releases the bridge enable.
- * @relation(SWR-BSP-003, scope=function)
+ * @relation(SWR-BSP-003, scope=function, role=Test)
  */
 void test_apply_disabled(void)
 {
@@ -185,7 +185,7 @@ void test_apply_disabled(void)
 
 /**
  * @brief A button reads as pressed when its pin is at the pressed level.
- * @relation(SWR-APP-002, scope=function)
+ * @relation(SWR-APP-002, scope=function, role=Test)
  */
 void test_buttons_follow_pressed_level(void)
 {

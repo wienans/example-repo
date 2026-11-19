@@ -36,7 +36,7 @@ void tearDown(void) {}
 
 /**
  * @brief A task first runs one full period after init, then every period.
- * @relation(SWR-SCH-001, scope=function)
+ * @relation(SWR-SCH-001, scope=function, role=Test)
  */
 void test_task_runs_every_period(void)
 {
@@ -56,7 +56,7 @@ void test_task_runs_every_period(void)
 
 /**
  * @brief A late call does not shift later deadlines.
- * @relation(SWR-SCH-001, scope=function)
+ * @relation(SWR-SCH-001, scope=function, role=Test)
  */
 void test_late_call_keeps_fixed_rate(void)
 {
@@ -73,7 +73,7 @@ void test_late_call_keeps_fixed_rate(void)
 
 /**
  * @brief Due tasks run in table order, each at most once per call.
- * @relation(SWR-SCH-001, scope=function)
+ * @relation(SWR-SCH-001, scope=function, role=Test)
  */
 void test_due_tasks_run_in_table_order_once_per_call(void)
 {
@@ -88,7 +88,7 @@ void test_due_tasks_run_in_table_order_once_per_call(void)
 
 /**
  * @brief Elapsed time is computed correctly when the millisecond counter wraps.
- * @relation(SWR-SCH-001, scope=function)
+ * @relation(SWR-SCH-001, scope=function, role=Test)
  */
 void test_wraparound_of_time(void)
 {
@@ -109,7 +109,7 @@ void test_wraparound_of_time(void)
 
 /**
  * @brief The same time passed twice does not run a task twice.
- * @relation(SWR-SCH-001, scope=function)
+ * @relation(SWR-SCH-001, scope=function, role=Test)
  */
 void test_repeated_time_does_not_rerun(void)
 {

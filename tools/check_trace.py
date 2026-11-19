@@ -1,11 +1,22 @@
 #!/usr/bin/env python3
-"""Check that every software requirement is verified.
+"""Check that every software requirement is implemented and verified.
 
-A requirement counts as verified when a file under ``tests/`` or ``tools/``
-carries a ``@relation(<UID>, ...)`` marker for it. StrictDoc already rejects
-markers that name an unknown UID, so this script checks the other direction.
-It also fails when a file in ``docs/requirements/software/`` is not included by
-``software_requirements.sdoc``, because StrictDoc would silently leave it out.
+Code and tests name a requirement with a StrictDoc marker that carries a role:
+
+- ``role=Implementation`` in ``src/``: the function implements the requirement.
+- ``role=Test`` in ``tests/``: the unit test verifies it.
+- ``role=Check`` in ``tools/``: a static check verifies it over the whole tree.
+
+StrictDoc already rejects markers that name an unknown UID, so this script
+checks the other direction. It fails when:
+
+- a marker under one of those directories lacks the role that directory needs,
+- a software requirement has no ``Test`` or ``Check`` marker,
+- a software requirement has no ``Implementation`` marker. A requirement that a
+  ``Check`` verifies is exempt, because it constrains every source file rather
+  than naming one,
+- a file in ``docs/requirements/software/`` is not included by
+  ``software_requirements.sdoc``, because StrictDoc would silently leave it out.
 
 This script checks traceability, not layering or determinism, so it carries no
 marker of its own. A marker here would count as evidence for a requirement it
@@ -20,8 +31,14 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent
 # PARENT includes one file per domain from REQUIREMENTS_DIR.
 PARENT = ROOT / "docs" / "requirements" / "software_requirements.sdoc"
 REQUIREMENTS_DIR = ROOT / "docs" / "requirements" / "software"
-VERIFICATION_DIRS = [ROOT / "tests", ROOT / "tools"]
-VERIFICATION_SUFFIXES = {".c", ".py"}
+# The role every marker in a directory must carry.
+ROLE_BY_DIR = {
+    ROOT / "src": "Implementation",
+    ROOT / "tests": "Test",
+    ROOT / "tools": "Check",
+}
+VERIFYING_ROLES = {"Test", "Check"}
+MARKED_SUFFIXES = {".c", ".h", ".py"}
 
 UID_LINE = re.compile(r"^UID:\s*(SWR-[A-Z]+-\d+)\s*$", re.MULTILINE)
 RELATION = re.compile(r"@relation\(([^)]*)\)")
@@ -45,17 +62,31 @@ def defined_uids() -> dict[str, pathlib.Path]:
     return found
 
 
-def verified_uids() -> set[str]:
-    found: set[str] = set()
-    for directory in VERIFICATION_DIRS:
-        for path in directory.rglob("*"):
-            if path.suffix not in VERIFICATION_SUFFIXES:
+def collect_markers() -> tuple[dict[str, set[str]], list[str]]:
+    """Map each role to the UIDs it names, and list markers with the wrong role."""
+    by_role: dict[str, set[str]] = {}
+    errors: list[str] = []
+    for directory, expected in ROLE_BY_DIR.items():
+        for path in sorted(directory.rglob("*")):
+            if path.suffix not in MARKED_SUFFIXES:
                 continue
-            for args in RELATION.findall(path.read_text(encoding="utf-8")):
-                found.update(
-                    a.strip() for a in args.split(",") if a.strip().startswith("SWR-")
-                )
-    return found
+            text = path.read_text(encoding="utf-8")
+            for match in RELATION.finditer(text):
+                args = [a.strip() for a in match.group(1).split(",")]
+                uids = [a for a in args if a.startswith("SWR-")]
+                if not uids:
+                    continue
+                roles = [a.removeprefix("role=") for a in args if a.startswith("role=")]
+                role = roles[0] if roles else None
+                if role != expected:
+                    line = text.count("\n", 0, match.start()) + 1
+                    errors.append(
+                        f"{path.relative_to(ROOT)}:{line}: marker needs role={expected}, "
+                        f"has {'role=' + role if role else 'no role'}"
+                    )
+                    continue
+                by_role.setdefault(role, set()).update(uids)
+    return by_role, errors
 
 
 def main() -> int:
@@ -63,14 +94,27 @@ def main() -> int:
     if not defined:
         print(f"check_trace: no requirements found in {REQUIREMENTS_DIR.relative_to(ROOT)}")
         return 1
-    orphans = unincluded_files()
-    for path in orphans:
-        print(f"{path.relative_to(ROOT)}: not included by {PARENT.relative_to(ROOT)}")
-    missing = sorted(defined.keys() - verified_uids())
-    for uid in missing:
-        print(f"{defined[uid].relative_to(ROOT)}: {uid} has no test or check")
-    print(f"check_trace: {len(defined) - len(missing)}/{len(defined)} requirements verified")
-    return 1 if missing or orphans else 0
+    problems: list[str] = []
+    for path in unincluded_files():
+        problems.append(f"{path.relative_to(ROOT)}: not included by {PARENT.relative_to(ROOT)}")
+
+    by_role, role_errors = collect_markers()
+    problems.extend(role_errors)
+
+    verified = set().union(*(by_role.get(r, set()) for r in VERIFYING_ROLES))
+    implemented = by_role.get("Implementation", set()) | by_role.get("Check", set())
+    for uid in sorted(defined.keys() - verified):
+        problems.append(f"{defined[uid].relative_to(ROOT)}: {uid} has no test or check")
+    for uid in sorted(defined.keys() - implemented):
+        problems.append(f"{defined[uid].relative_to(ROOT)}: {uid} has no implementation")
+
+    for line in problems:
+        print(line)
+    print(
+        f"check_trace: {len(defined.keys() & verified)}/{len(defined)} requirements verified, "
+        f"{len(defined.keys() & implemented)}/{len(defined)} implemented"
+    )
+    return 1 if problems else 0
 
 
 if __name__ == "__main__":

@@ -18,7 +18,7 @@ static uint16_t s_encoder_previous;
 
 /**
  * @brief Initialise all peripherals in order and stop at the first failure.
- * @relation(SWR-BSP-004, scope=function)
+ * @relation(SWR-BSP-004, scope=function, role=Implementation)
  */
 bool bsp_init(void)
 {
@@ -40,7 +40,7 @@ bool bsp_init(void)
 
 /**
  * @brief Read the HAL time base.
- * @relation(SWR-APP-001, scope=function)
+ * @relation(SWR-APP-001, scope=function, role=Implementation)
  */
 uint32_t bsp_millis(void)
 {
@@ -49,7 +49,7 @@ uint32_t bsp_millis(void)
 
 /**
  * @brief Encoder delta to rpm and ADC raw to mA.
- * @relation(SWR-BSP-001, SWR-BSP-002, scope=function)
+ * @relation(SWR-BSP-001, SWR-BSP-002, scope=function, role=Implementation)
  */
 motor_sample_t bsp_motor_sample(void)
 {
@@ -64,7 +64,7 @@ motor_sample_t bsp_motor_sample(void)
 
 /**
  * @brief Map a signed drive command onto direction, PWM and enable.
- * @relation(SWR-BSP-003, scope=function)
+ * @relation(SWR-BSP-003, scope=function, role=Implementation)
  */
 void bsp_motor_apply(drive_cmd_t cmd)
 {
@@ -76,7 +76,7 @@ void bsp_motor_apply(drive_cmd_t cmd)
 
 /**
  * @brief Translate button pin levels into pressed flags.
- * @relation(SWR-APP-002, scope=function)
+ * @relation(SWR-APP-002, scope=function, role=Implementation)
  */
 bsp_buttons_t bsp_read_buttons(void)
 {

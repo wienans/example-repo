@@ -25,7 +25,7 @@ static fault_flags_t step(rpm_t speed, milliamp_t current, duty_permille_t duty)
 
 /**
  * @brief Current at the limit is fine; above it in either direction trips at once.
- * @relation(SWR-FLT-001, scope=function)
+ * @relation(SWR-FLT-001, scope=function, role=Test)
  */
 void test_overcurrent_trips_above_limit_in_both_directions(void)
 {
@@ -37,7 +37,7 @@ void test_overcurrent_trips_above_limit_in_both_directions(void)
 
 /**
  * @brief Stall trips on the stall_ticks-th consecutive stalled step.
- * @relation(SWR-FLT-002, scope=function)
+ * @relation(SWR-FLT-002, scope=function, role=Test)
  */
 void test_stall_trips_after_consecutive_ticks(void)
 {
@@ -48,7 +48,7 @@ void test_stall_trips_after_consecutive_ticks(void)
 
 /**
  * @brief One step at or above the speed threshold restarts the count.
- * @relation(SWR-FLT-002, scope=function)
+ * @relation(SWR-FLT-002, scope=function, role=Test)
  */
 void test_stall_count_resets_when_shaft_turns(void)
 {
@@ -62,7 +62,7 @@ void test_stall_count_resets_when_shaft_turns(void)
 
 /**
  * @brief One step below the duty threshold restarts the count.
- * @relation(SWR-FLT-002, scope=function)
+ * @relation(SWR-FLT-002, scope=function, role=Test)
  */
 void test_stall_count_resets_when_duty_drops(void)
 {
@@ -76,7 +76,7 @@ void test_stall_count_resets_when_duty_drops(void)
 
 /**
  * @brief Low duty never counts as a stall.
- * @relation(SWR-FLT-002, scope=function)
+ * @relation(SWR-FLT-002, scope=function, role=Test)
  */
 void test_low_duty_never_stalls(void)
 {
@@ -87,7 +87,7 @@ void test_low_duty_never_stalls(void)
 
 /**
  * @brief Reset restarts the stall count.
- * @relation(SWR-FLT-002, scope=function)
+ * @relation(SWR-FLT-002, scope=function, role=Test)
  */
 void test_reset_restarts_stall_count(void)
 {
@@ -101,7 +101,7 @@ void test_reset_restarts_stall_count(void)
 
 /**
  * @brief Both faults are reported together.
- * @relation(SWR-FLT-001, SWR-FLT-002, scope=function)
+ * @relation(SWR-FLT-001, SWR-FLT-002, scope=function, role=Test)
  */
 void test_overcurrent_and_stall_report_together(void)
 {

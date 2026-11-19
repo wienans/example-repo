@@ -11,9 +11,11 @@ TITLE: Conventions
 STATEMENT: >>>
 Each requirement names the module that implements it. Code and tests point back
 at a requirement with a marker inside their Doxygen comment, in the form
-``@relation(SWR-PI-001, scope=function)``. ``make docs`` fails when a marker
-names a UID that this document does not define. ``make trace`` fails when a
-requirement has no test.
+``@relation(SWR-PI-001, scope=function, role=Implementation)``. The role is
+``Implementation`` in ``src/``, ``Test`` in ``tests/`` and ``Check`` in
+``tools/``. ``make docs`` fails when a marker names a UID that this document
+does not define. ``make trace`` fails when a requirement has no test or no
+implementation.
 
 Units: speed in rpm (``rpm_t``), current in mA (``milliamp_t``), and duty in
 permille from -1000 to 1000 (``duty_permille_t``). The sign of the duty sets

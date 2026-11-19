@@ -16,7 +16,7 @@ static void init(int32_t kp_q8, int32_t ki_q8, int32_t out_min, int32_t out_max)
 
 /**
  * @brief Proportional-only output is Kp * error.
- * @relation(SWR-PI-001, scope=function)
+ * @relation(SWR-PI-001, scope=function, role=Test)
  */
 void test_proportional_output_is_gain_times_error(void)
 {
@@ -27,7 +27,7 @@ void test_proportional_output_is_gain_times_error(void)
 
 /**
  * @brief The integral term adds Ki * error every step, including the current one.
- * @relation(SWR-PI-001, scope=function)
+ * @relation(SWR-PI-001, scope=function, role=Test)
  */
 void test_integral_accumulates_each_step(void)
 {
@@ -39,7 +39,7 @@ void test_integral_accumulates_each_step(void)
 
 /**
  * @brief Output is the sum of both terms.
- * @relation(SWR-PI-001, scope=function)
+ * @relation(SWR-PI-001, scope=function, role=Test)
  */
 void test_output_sums_proportional_and_integral(void)
 {
@@ -50,7 +50,7 @@ void test_output_sums_proportional_and_integral(void)
 
 /**
  * @brief Output never leaves [out_min, out_max].
- * @relation(SWR-PI-001, scope=function)
+ * @relation(SWR-PI-001, scope=function, role=Test)
  */
 void test_output_is_clamped_to_limits(void)
 {
@@ -61,7 +61,7 @@ void test_output_is_clamped_to_limits(void)
 
 /**
  * @brief The integral contribution is bounded by the output limits.
- * @relation(SWR-PI-002, scope=function)
+ * @relation(SWR-PI-002, scope=function, role=Test)
  */
 void test_integrator_is_clamped_to_output_limits(void)
 {
@@ -74,7 +74,7 @@ void test_integrator_is_clamped_to_output_limits(void)
 
 /**
  * @brief While saturated in the direction of the error, the integrator holds.
- * @relation(SWR-PI-002, scope=function)
+ * @relation(SWR-PI-002, scope=function, role=Test)
  */
 void test_integrator_holds_while_saturated_with_error(void)
 {
@@ -87,7 +87,7 @@ void test_integrator_holds_while_saturated_with_error(void)
 
 /**
  * @brief While saturated low with negative error, the integrator holds.
- * @relation(SWR-PI-002, scope=function)
+ * @relation(SWR-PI-002, scope=function, role=Test)
  */
 void test_integrator_holds_while_saturated_low(void)
 {
@@ -100,7 +100,7 @@ void test_integrator_holds_while_saturated_low(void)
 
 /**
  * @brief An error opposing the saturation still integrates and unwinds.
- * @relation(SWR-PI-002, scope=function)
+ * @relation(SWR-PI-002, scope=function, role=Test)
  */
 void test_error_against_saturation_integrates(void)
 {
@@ -112,7 +112,7 @@ void test_error_against_saturation_integrates(void)
 
 /**
  * @brief Reset discards the accumulated integral.
- * @relation(SWR-PI-003, scope=function)
+ * @relation(SWR-PI-003, scope=function, role=Test)
  */
 void test_reset_clears_integrator(void)
 {
@@ -126,7 +126,7 @@ void test_reset_clears_integrator(void)
 
 /**
  * @brief Gains of 65535 with |error| of 100000 keep the correct sign and value.
- * @relation(SWR-PI-001, SWR-PI-002, scope=function)
+ * @relation(SWR-PI-001, SWR-PI-002, scope=function, role=Test)
  */
 void test_extreme_gains_and_error_do_not_overflow(void)
 {

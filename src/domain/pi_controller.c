@@ -24,7 +24,7 @@ static int64_t clamp64(int64_t value, int64_t lo, int64_t hi)
 
 /**
  * @brief Store the configuration and clear the integrator.
- * @relation(SWR-PI-001, SWR-PI-003, scope=function)
+ * @relation(SWR-PI-001, SWR-PI-003, scope=function, role=Implementation)
  */
 void pi_init(pi_controller_t *pi, const pi_config_t *cfg)
 {
@@ -34,7 +34,7 @@ void pi_init(pi_controller_t *pi, const pi_config_t *cfg)
 
 /**
  * @brief Clear the integrator.
- * @relation(SWR-PI-003, scope=function)
+ * @relation(SWR-PI-003, scope=function, role=Implementation)
  */
 void pi_reset(pi_controller_t *pi)
 {
@@ -43,7 +43,7 @@ void pi_reset(pi_controller_t *pi)
 
 /**
  * @brief Compute the clamped PI output with conditional integration.
- * @relation(SWR-PI-001, SWR-PI-002, scope=function)
+ * @relation(SWR-PI-001, SWR-PI-002, scope=function, role=Implementation)
  */
 int32_t pi_step(pi_controller_t *pi, int32_t error)
 {

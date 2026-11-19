@@ -18,8 +18,8 @@ The repo has four kinds of documentation: requirements, architecture, design dec
 
 The pieces connect in four places:
 
-1. Every implementing function and every test carries a StrictDoc marker inside its Doxygen comment, for example `@relation(SWR-PI-001, scope=function)`. StrictDoc links the requirement to the code and fails `make docs` when a marker names an unknown UID. The Doxyfile defines `relation` as an alias, so Doxygen renders the marker as a "Requirement" paragraph instead of warning.
-2. `tools/check_trace.py` fails `make trace` when a software requirement has no marker under `tests/` or `tools/`.
+1. Every implementing function and every test carries a StrictDoc marker inside its Doxygen comment, for example `@relation(SWR-PI-001, scope=function, role=Implementation)`. The role is `Implementation` in `src/`, `Test` in `tests/` and `Check` in `tools/`, so the StrictDoc traceability screen shows which links implement a requirement and which verify it. StrictDoc links the requirement to the code and fails `make docs` when a marker names an unknown UID. The Doxyfile defines `relation` as an alias, so Doxygen renders the marker as a "Requirement" paragraph instead of warning.
+2. `tools/check_trace.py` fails `make trace` when a software requirement has no `Test` or `Check` marker, when it has no `Implementation` marker, or when a marker carries the wrong role for its directory. A requirement verified by a `Check` needs no `Implementation` marker, because it constrains every source file rather than one function.
 3. Markdown pages link to requirements with `[LINK: UID]`. StrictDoc resolves the tag and fails on an unknown UID.
 4. `tools/check_diagrams.py` checks every Mermaid diagram against `docs/architecture/00_diagram_conventions.md` and renders it with Mermaid CLI. `make docs` runs it first, so a diagram that does not render never reaches the StrictDoc site.
 
@@ -28,6 +28,6 @@ StrictDoc's HTML bundles Mermaid, so the diagrams render offline. Doxygen render
 ## Consequences
 
 - Renaming a requirement UID without updating its markers fails `make docs`.
-- Deleting the last test of a requirement fails `make trace`.
+- Deleting the last test of a requirement fails `make trace`. So does deleting the last function that implements it.
 - StrictDoc warns that the old `strictdoc.toml` format is deprecated, so the project uses `strictdoc_config.py`.
 - GitHub shows `[LINK: UID]` tags as plain text. The reader then looks up the UID in the requirements files.

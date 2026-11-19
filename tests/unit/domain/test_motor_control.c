@@ -42,7 +42,7 @@ static void start_at(rpm_t measured)
 
 /**
  * @brief A new controller is IDLE, fault-free and does not drive.
- * @relation(SWR-FSM-001, SWR-CTL-002, scope=function)
+ * @relation(SWR-FSM-001, SWR-CTL-002, scope=function, role=Test)
  */
 void test_starts_idle_with_drive_off(void)
 {
@@ -54,7 +54,7 @@ void test_starts_idle_with_drive_off(void)
 
 /**
  * @brief The tracked setpoint moves at most ramp_rpm_per_tick per step.
- * @relation(SWR-CTL-001, scope=function)
+ * @relation(SWR-CTL-001, scope=function, role=Test)
  */
 void test_setpoint_ramps_up_and_down(void)
 {
@@ -80,7 +80,7 @@ void test_setpoint_ramps_up_and_down(void)
 
 /**
  * @brief Requested setpoints beyond +/- max_setpoint_rpm are clamped.
- * @relation(SWR-CTL-001, scope=function)
+ * @relation(SWR-CTL-001, scope=function, role=Test)
  */
 void test_setpoint_is_clamped(void)
 {
@@ -100,7 +100,7 @@ void test_setpoint_is_clamped(void)
 
 /**
  * @brief STOP disables the drive from the next step.
- * @relation(SWR-CTL-002, scope=function)
+ * @relation(SWR-CTL-002, scope=function, role=Test)
  */
 void test_stop_disables_drive(void)
 {
@@ -114,7 +114,7 @@ void test_stop_disables_drive(void)
 
 /**
  * @brief Entering RUNNING resets the PI and starts the ramp at the measured speed.
- * @relation(SWR-CTL-003, scope=function)
+ * @relation(SWR-CTL-003, scope=function, role=Test)
  */
 void test_entering_running_resets_pi_and_ramp(void)
 {
@@ -139,7 +139,7 @@ void test_entering_running_resets_pi_and_ramp(void)
 
 /**
  * @brief The step that detects a fault already returns a disabled command and latches.
- * @relation(SWR-CTL-004, SWR-FLT-001, scope=function)
+ * @relation(SWR-CTL-004, SWR-FLT-001, scope=function, role=Test)
  */
 void test_overcurrent_disables_in_same_step_and_latches(void)
 {
@@ -157,7 +157,7 @@ void test_overcurrent_disables_in_same_step_and_latches(void)
 
 /**
  * @brief START and STOP do not leave FAULT; CLEAR_FAULT returns to IDLE with no faults.
- * @relation(SWR-CTL-004, SWR-FSM-003, scope=function)
+ * @relation(SWR-CTL-004, SWR-FSM-003, scope=function, role=Test)
  */
 void test_only_clear_fault_leaves_fault(void)
 {
@@ -177,7 +177,7 @@ void test_only_clear_fault_leaves_fault(void)
 
 /**
  * @brief A locked rotor trips STALL once the applied duty has been high for stall_ticks steps.
- * @relation(SWR-CTL-004, SWR-FLT-002, scope=function)
+ * @relation(SWR-CTL-004, SWR-FLT-002, scope=function, role=Test)
  */
 void test_stall_trips_from_applied_duty(void)
 {
@@ -195,7 +195,7 @@ void test_stall_trips_from_applied_duty(void)
 
 /**
  * @brief An externally raised FAULT event also disables the drive.
- * @relation(SWR-CTL-002, SWR-FSM-003, scope=function)
+ * @relation(SWR-CTL-002, SWR-FSM-003, scope=function, role=Test)
  */
 void test_fault_event_disables_drive(void)
 {

@@ -7,7 +7,7 @@
 
 /**
  * @brief Start every task's first period at now_ms.
- * @relation(SWR-SCH-001, scope=function)
+ * @relation(SWR-SCH-001, scope=function, role=Implementation)
  */
 void sched_init(sched_task_t *tasks, size_t count, uint32_t now_ms)
 {
@@ -18,7 +18,7 @@ void sched_init(sched_task_t *tasks, size_t count, uint32_t now_ms)
 
 /**
  * @brief Run due tasks in table order.
- * @relation(SWR-SCH-001, scope=function)
+ * @relation(SWR-SCH-001, scope=function, role=Implementation)
  */
 void sched_run(sched_task_t *tasks, size_t count, uint32_t now_ms)
 {

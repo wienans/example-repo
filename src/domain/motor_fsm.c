@@ -29,7 +29,7 @@ static const motor_state_t k_transitions[MOTOR_STATE_COUNT][MOTOR_EVENT_COUNT] =
 
 /**
  * @brief Look up the next state in the transition table.
- * @relation(SWR-FSM-001, SWR-FSM-002, SWR-FSM-003, scope=function)
+ * @relation(SWR-FSM-001, SWR-FSM-002, SWR-FSM-003, scope=function, role=Implementation)
  */
 motor_state_t motor_fsm_next(motor_state_t state, motor_event_t event)
 {

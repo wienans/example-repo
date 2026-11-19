@@ -19,7 +19,7 @@ static int64_t abs64(int32_t value)
 
 /**
  * @brief Store the thresholds and reset the stall counter.
- * @relation(SWR-FLT-001, SWR-FLT-002, scope=function)
+ * @relation(SWR-FLT-001, SWR-FLT-002, scope=function, role=Implementation)
  */
 void fault_monitor_init(fault_monitor_t *fm, const fault_monitor_config_t *cfg)
 {
@@ -29,7 +29,7 @@ void fault_monitor_init(fault_monitor_t *fm, const fault_monitor_config_t *cfg)
 
 /**
  * @brief Reset the stall counter.
- * @relation(SWR-FLT-002, scope=function)
+ * @relation(SWR-FLT-002, scope=function, role=Implementation)
  */
 void fault_monitor_reset(fault_monitor_t *fm)
 {
@@ -38,7 +38,7 @@ void fault_monitor_reset(fault_monitor_t *fm)
 
 /**
  * @brief Detect overcurrent immediately and stall after consecutive steps.
- * @relation(SWR-FLT-001, SWR-FLT-002, scope=function)
+ * @relation(SWR-FLT-001, SWR-FLT-002, scope=function, role=Implementation)
  */
 fault_flags_t fault_monitor_step(fault_monitor_t *fm, const motor_sample_t *sample, duty_permille_t applied_duty)
 {
