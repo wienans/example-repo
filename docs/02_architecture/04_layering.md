@@ -75,8 +75,8 @@ The script finds a header's layer by its file name alone. Every build adds each 
 
 | Requirement | Check |
 | --- | --- |
-| [LINK: SWR-ARC-001] | The `ALLOWED` table in `tools/check_layers.py` |
-| [LINK: SWR-DET-001] | The forbidden-word scan in `tools/check_layers.py` |
+| {need}`SWR-ARC-001` | The `ALLOWED` table in `tools/check_layers.py` |
+| {need}`SWR-DET-001` | The forbidden-word scan in `tools/check_layers.py` |
 
 ## What the check does not cover
 

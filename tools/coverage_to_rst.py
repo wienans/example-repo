@@ -1,155 +1,66 @@
 #!/usr/bin/env python3
-"""Build the "Code coverage" StrictDoc document from gcovr's JSON.
+"""Build the "Code coverage" page from gcovr's JSON.
 
-StrictDoc's own *.gcov.json import only marks a function covered once it ran
-and never reaches a requirement. This script reads gcovr's JSON and the role=Implementation markers in src/ and
-writes one document, ``Code coverage``:
+gcovr knows lines and functions, not requirements. This script reads gcovr's
+JSON and the role=Implementation markers in src/ and writes
+``docs/generated/coverage.rst``:
 
 - an overview table of all files (lines, branches, functions) with a link to
   gcovr's full HTML report, which the make target copies next to the page,
-- "By requirement": one REQ_COVERAGE node per requirement, a Child of that
-  requirement, with the lines and branches of the code its markers name and
-  the lines and branches its tests never reach,
-- "By file": a section per source file with its summary table and a link to
-  gcovr's page for that file, then one FUNC_COVERAGE node per function with
-  its execution count, lines, branches, the requirements it implements, links
-  to each uncovered line in gcovr's page, and a File relation to the function.
+- "By requirement": one ``cov`` need per requirement that ``measures`` it,
+  with the lines and branches of the code its markers name and the lines and
+  branches its tests never reach,
+- "By file": a section per source file with its summary table, a link to
+  gcovr's page for that file, and a table of its functions with execution
+  count, lines, branches, the requirements they implement and links to each
+  uncovered line in gcovr's page. These rows are not needs, so the need count
+  stays at one per requirement.
 
-Which lines belong to a requirement follows StrictDoc's marker scopes:
+Which lines belong to a requirement follows the marker scopes:
 
 - ``scope=function``: every line of the function below the comment,
 - ``scope=range_start`` ... ``scope=range_end``: the lines from the start
   marker to the end marker,
 - ``scope=line``: the marker's line and the line after it, also when the
-  marker trails code (``x = 1; // @relation(...)``), as StrictDoc counts it,
+  marker trails code (``x = 1; // @relation(...)``),
 - ``scope=file``: every line of the file.
 
-Markers may sit in ``/* */`` or ``//`` comments, read as StrictDoc's C reader
-reads them: a function marker belongs to the comment that ends on the line
-right above the definition, so in ``//`` style the marker's own line must be
-that line, and a marker in a one-line ``/* @relation(...) */`` is ignored by
-StrictDoc, so the script warns about it instead of counting it.
+source_markers.py reads and pairs the markers and reports the ones it cannot
+place; this script prints those as warnings.
 
 A narrower marker wins: a line inside a range or line marker counts only for
 that marker's requirements, not for the requirements of the enclosing function
-or file marker. An implementation marker the script cannot place is printed
-as a warning instead of being skipped silently.
+or file marker.
 
 Coverage is that of the whole test suite (one ``ceedling gcov:all`` run), not
-of the tests that verify a requirement.
+of the tests that verify a requirement. If gcovr's JSON is missing (the code
+did not build), the page says so instead of failing the site.
 
-Markers are read by source_markers.py, so they count where StrictDoc shows
-them. If gcovr's JSON is missing (the code did not build), the document says
-so instead of failing the site.
-
-Every UID ends in FULL, PARTIAL or NONE, which tools/strictdoc/site.css
-colours green, amber or red.
+Each need's ``:style:`` is its status in lower case (full, partial, none), for
+the colours in docs/_static/.
 
 Run: make docs
-Output: docs/generated/coverage.sdoc (git ignores it; see
-test_results_to_sdoc.py for why it lives there). StrictDoc renders it as
-html/<checkout>/docs/generated/coverage.html, and make docs copies gcovr's HTML
-to the gcovr/ folder next to it.
+Output: docs/generated/coverage.rst (git ignores it). Sphinx renders it as
+<html>/generated/coverage.html, and make docs copies gcovr's HTML to the
+gcovr/ folder next to it.
 """
 
 import dataclasses
 import hashlib
 import json
 import pathlib
+import re
 import sys
 
-from source_markers import ROOT, read_markers
+from source_markers import ROOT, Piece, code_pieces, read_markers
+from test_results_to_rst import heading, list_table, rst_text
 
 GCOVR_JSON = ROOT / "build" / "ceedling" / "artifacts" / "gcov" / "gcovr" / "GcovCoverage.json"
-OUT = ROOT / "docs" / "generated" / "coverage.sdoc"
-# gcovr's HTML. StrictDoc also shows coverage nodes on the requirement pages,
-# so the link climbs to docs/ first: it resolves from docs/generated/ and from
-# docs/01_requirements/, which sit at the same depth.
-GCOVR_HTML = "../generated/gcovr"
+OUT = ROOT / "docs" / "generated" / "coverage.rst"
+# gcovr's HTML, relative to the page. Links appear only on this page: a
+# requirement page lists a coverage need by ID, not its body.
+GCOVR_HTML = "gcovr"
 GCOVR_PREFIX = "GcovCoverageResults"
-
-HEADER = """\
-[DOCUMENT]
-TITLE: Code coverage
-OPTIONS:
-  VIEW_STYLE: Table
-
-[GRAMMAR]
-ELEMENTS:
-- TAG: TEXT
-  FIELDS:
-  - TITLE: STATEMENT
-    TYPE: String
-    REQUIRED: True
-- TAG: REQ_COVERAGE
-  FIELDS:
-  - TITLE: UID
-    TYPE: String
-    REQUIRED: True
-  - TITLE: TITLE
-    TYPE: String
-    REQUIRED: True
-  - TITLE: STATUS
-    TYPE: SingleChoice(FULL, PARTIAL, NONE)
-    REQUIRED: True
-  - TITLE: CODE
-    TYPE: String
-    REQUIRED: False
-  - TITLE: UNCOVERED
-    TYPE: String
-    REQUIRED: False
-  RELATIONS:
-  - TYPE: Parent
-    ROLE: measures
-    REVERSE_ROLE: is measured by
-- TAG: FUNC_COVERAGE
-  FIELDS:
-  - TITLE: UID
-    TYPE: String
-    REQUIRED: True
-  - TITLE: TITLE
-    TYPE: String
-    REQUIRED: True
-  - TITLE: STATUS
-    TYPE: SingleChoice(FULL, PARTIAL, NONE)
-    REQUIRED: True
-  - TITLE: CALLS
-    TYPE: String
-    REQUIRED: True
-  - TITLE: LINES
-    TYPE: String
-    REQUIRED: True
-  - TITLE: BRANCHES
-    TYPE: String
-    REQUIRED: True
-  - TITLE: REQUIREMENTS
-    TYPE: String
-    REQUIRED: False
-  - TITLE: UNCOVERED
-    TYPE: String
-    REQUIRED: False
-  RELATIONS:
-  - TYPE: File"""
-
-
-@dataclasses.dataclass
-class Piece:
-    """The code one implementation marker names."""
-
-    file: str
-    kind: str  # function, range, line or file
-    uids: list[str]
-    function: str = ""
-    first: int = 0
-    last: int = 0
-
-    def label(self) -> str:
-        if self.kind == "function":
-            return f"``{self.function}`` in ``{self.file}``"
-        if self.kind == "file":
-            return f"``{self.file}`` (whole file)"
-        return f"``{self.file}:{self.first}-{self.last}`` ({self.kind})"
-
 
 @dataclasses.dataclass
 class Tally:
@@ -190,33 +101,8 @@ def gcovr_page(file: str) -> str:
 def implementation_pieces() -> tuple[list[Piece], list[str]]:
     """Every role=Implementation marker in src/ as a Piece, and those it cannot place."""
     markers, errors = read_markers()
-    warnings = [e for e in errors if e.startswith("src/")]
-    pieces: list[Piece] = []
-    open_ranges: dict[str, list[tuple[list[str], int]]] = {}
-    for marker in markers:
-        if marker.role != "Implementation":
-            continue
-        stack = open_ranges.setdefault(marker.file, [])
-        if marker.scope == "function":
-            pieces.append(Piece(marker.file, "function", marker.uids, function=marker.function))
-        elif marker.scope == "file":
-            pieces.append(Piece(marker.file, "file", marker.uids))
-        elif marker.scope == "line":
-            pieces.append(Piece(marker.file, "line", marker.uids, first=marker.line, last=marker.line + 1))
-        elif marker.scope == "range_start":
-            stack.append((marker.uids, marker.line))
-        elif marker.scope == "range_end":
-            if not stack or stack[-1][0] != marker.uids:
-                warnings.append(f"{marker.where}: range_end without a matching range_start")
-                continue
-            _, start = stack.pop()
-            pieces.append(Piece(marker.file, "range", marker.uids, first=start, last=marker.line))
-        else:
-            warnings.append(f"{marker.where}: unsupported scope '{marker.scope}'")
-    for file, stack in open_ranges.items():
-        for _, start in stack:
-            warnings.append(f"{file}:{start}: range_start without a range_end")
-    return pieces, warnings
+    found, warnings = code_pieces(markers, "Implementation")
+    return found, [e for e in errors if e.startswith("src/")] + warnings
 
 
 def tally(file: str, records: list[dict]) -> Tally:
@@ -224,7 +110,7 @@ def tally(file: str, records: list[dict]) -> Tally:
     result = Tally()
     for line in sorted(records, key=lambda r: r["line_number"]):
         number = line["line_number"]
-        link = f"`{file}:{number} <{gcovr_page(file)}#L{number}>`_"
+        link = f"`{file}:{number} <{gcovr_page(file)}#L{number}>`__"
         where = f" in ``{line['function_name']}``" if line.get("function_name") else ""
         result.lines += 1
         result.lines_hit += line["count"] > 0
@@ -239,27 +125,14 @@ def tally(file: str, records: list[dict]) -> Tally:
     return result
 
 
-def list_table(caption: str, header: list[str], rows: list[list[str]], widths: str = "") -> str:
-    out = [f".. list-table:: {caption}", "   :header-rows: 1"]
-    if widths:
-        out.append(f"   :widths: {widths}")
-    out.append("")
-    for row in [header, *rows]:
-        out.append(f"   * - {row[0]}")
-        out += [f"     - {cell}" for cell in row[1:]]
-    return "\n".join(out)
+def label(file: str) -> str:
+    """The label of a source file's section, for links from the overview table."""
+    return "cov-" + re.sub(r"[^a-z0-9]+", "-", file.lower())
 
 
-def text_node(statement: str) -> str:
-    return f"[TEXT]\nSTATEMENT: >>>\n{statement}\n<<<"
-
-
-def multiline(field: str, value: str) -> list[str]:
-    return [f"{field}: >>>", value, "<<<"]
-
-
-def section_uid(file: str) -> str:
-    return "CF-" + pathlib.Path(file).stem
+def cell(text: str) -> str:
+    """A list-table cell whose text may span lines, such as a bullet list."""
+    return text.replace("\n", "\n       ")
 
 
 def main() -> int:
@@ -268,13 +141,12 @@ def main() -> int:
         # page rather than fail the whole site.
         OUT.parent.mkdir(parents=True, exist_ok=True)
         OUT.write_text(
-            HEADER + "\n\n" + text_node(
-                f"No coverage data: ``{GCOVR_JSON.relative_to(ROOT)}`` is missing. "
-                "The coverage build did not finish; run ``ceedling gcov:all`` to see why."
-            ) + "\n",
+            heading("Code coverage", "=") + "\n\n"
+            f"No coverage data: ``{GCOVR_JSON.relative_to(ROOT)}`` is missing. "
+            "The coverage build did not finish; run ``ceedling gcov:all`` to see why.\n",
             encoding="utf-8",
         )
-        print(f"coverage_to_sdoc: {GCOVR_JSON.relative_to(ROOT)} missing, wrote a placeholder")
+        print(f"coverage_to_rst: {GCOVR_JSON.relative_to(ROOT)} missing, wrote a placeholder")
         return 0
     data = json.loads(GCOVR_JSON.read_text(encoding="utf-8"))
     # gcovr's line records by file and line number.
@@ -342,7 +214,7 @@ def main() -> int:
         ]
 
     header = ["File", "Lines", "Branches", "Functions"]
-    rows = [file_row(name, f"`{name} <#{section_uid(name)}>`_") for name in files]
+    rows = [file_row(name, f":ref:`{name} <{label(name)}>`") for name in files]
     grand = Tally()
     for name in files:
         for _, function_tally in files[name]:
@@ -357,13 +229,10 @@ def main() -> int:
         ]
     )
     parts = [
-        HEADER,
-        text_node(
-            f"Generated from ``{GCOVR_JSON.relative_to(ROOT)}`` by "
-            "``tools/coverage_to_sdoc.py``. Line-by-line detail: "
-            f"`gcovr report <{GCOVR_HTML}/{GCOVR_PREFIX}.html>`_.\n\n"
-            + list_table("All files", header, rows, widths="40 20 20 20")
-        ),
+        heading("Code coverage", "="),
+        f"Generated from ``{GCOVR_JSON.relative_to(ROOT)}`` by ``tools/coverage_to_rst.py``. "
+        f"Line-by-line detail: `gcovr report <{GCOVR_HTML}/{GCOVR_PREFIX}.html>`__.",
+        list_table("All files", header, rows, widths="40 20 20 20"),
     ]
 
     # By requirement.
@@ -372,15 +241,13 @@ def main() -> int:
         for uid in piece.uids:
             by_requirement.setdefault(uid, []).append(piece)
     counts = {"FULL": 0, "PARTIAL": 0, "NONE": 0}
-    parts.append(
-        "[[SECTION]]\nUID: COV-BY-REQUIREMENT\nTITLE: By requirement\n\n"
-        + text_node(
-            "Each entry counts the lines its ``role=Implementation`` markers name: "
-            "a whole function, a range, a line or a file. A line inside a range or "
-            "line marker counts only for that marker's requirements. Coverage is "
-            "that of the whole test suite."
-        )
-    )
+    parts += [
+        heading("By requirement", "-"),
+        "Each entry counts the lines its ``role=Implementation`` markers name: "
+        "a whole function, a range, a line or a file. A line inside a range or "
+        "line marker counts only for that marker's requirements. Coverage is "
+        "that of the whole test suite.",
+    ]
     for number, uid in enumerate(sorted(by_requirement), start=1):
         # Line records by (file, line), so overlapping pieces count once.
         union: dict[tuple[str, int], dict] = {}
@@ -411,34 +278,30 @@ def main() -> int:
         # Code the unit tests do not build is a gap, not full coverage.
         status = "PARTIAL" if total.status == "FULL" and unmeasured else total.status
         counts[status] += 1
-        node = [
-            "[REQ_COVERAGE]",
-            # Short UID: the Child list shows "UID TITLE". The status suffix
-            # drives the colour, as for test results.
-            f"UID: COV-{number:03d}-{status}",
-            f"TITLE: lines {percent(total.lines_hit, total.lines)}, branches {percent(total.branches_hit, total.branches)}",
-            f"STATUS: {status}",
-            *multiline("CODE", "\n".join(code)),
+        need = [
+            f".. cov:: Coverage of {uid}",
+            f"   :id: COV-{number:03d}",
+            f"   :status: {status}",
+            f"   :style: {status.lower()}",
+            f"   :measures: {uid}",
+            f"   :lines: {percent(total.lines_hit, total.lines)}",
+            f"   :branches: {percent(total.branches_hit, total.branches)}",
+            "",
+            "   Code:",
+            "",
+            *[f"   {line}" for line in code],
         ]
         if total.uncovered:
-            node += multiline("UNCOVERED", "\n".join(total.uncovered))
-        node += ["RELATIONS:", "- TYPE: Parent", f"  VALUE: {uid}", "  ROLE: measures"]
-        parts.append("\n".join(node))
-    parts.append("[[/SECTION]]")
+            need += ["", "   Uncovered:", "", *[f"   {line}" for line in total.uncovered]]
+        parts.append("\n".join(need))
 
     # By file.
-    parts.append("[[SECTION]]\nUID: COV-BY-FILE\nTITLE: By file")
-    number = 0
+    parts.append(heading("By file", "-"))
+    function_count = 0
     for name, functions in files.items():
-        parts.append(
-            f"[[SECTION]]\nUID: {section_uid(name)}\nTITLE: {name}\n\n"
-            + text_node(
-                f"`Line-by-line detail in gcovr <{gcovr_page(name)}>`_\n\n"
-                + list_table(f"Summary for {name}", header[1:], [file_row(name, "")[1:]])
-            )
-        )
+        rows = []
         for function, function_tally in functions:
-            number += 1
+            function_count += 1
             # Requirements of every piece that covers a line of this function.
             function_lines = {
                 n for n, r in records[name].items() if r.get("function_name") == function["name"]
@@ -448,32 +311,35 @@ def main() -> int:
                 lines = piece_lines(piece) if piece.file == name else None
                 if lines and function_lines & lines.keys():
                     uids += [u for u in piece.uids if u not in uids]
-            node = [
-                "[FUNC_COVERAGE]",
-                f"UID: FC-{number:03d}-{function_tally.status}",
-                f"TITLE: {function['name']}",
-                f"STATUS: {function_tally.status}",
-                f"CALLS: {function['execution_count']}",
-                f"LINES: {percent(function_tally.lines_hit, function_tally.lines)}",
-                f"BRANCHES: {percent(function_tally.branches_hit, function_tally.branches)}",
-            ]
-            # [LINK: UID] links without adding a relation, so the requirement
-            # pages stay lean. StrictDoc resolves one per line.
-            node += multiline(
-                "REQUIREMENTS", "\n".join(f"- [LINK: {u}]" for u in sorted(uids)) if uids else "None: a helper."
+            rows.append(
+                [
+                    f"``{function['name']}``",
+                    function_tally.status,
+                    str(function["execution_count"]),
+                    percent(function_tally.lines_hit, function_tally.lines),
+                    percent(function_tally.branches_hit, function_tally.branches),
+                    ", ".join(f":need:`{u}`" for u in sorted(uids)) or "None: a helper.",
+                    cell("\n".join(function_tally.uncovered)) or "None",
+                ]
             )
-            if function_tally.uncovered:
-                node += multiline("UNCOVERED", "\n".join(function_tally.uncovered))
-            node += ["RELATIONS:", "- TYPE: File", f"  VALUE: {name}", f"  FUNCTION: {function['name']}"]
-            parts.append("\n".join(node))
-        parts.append("[[/SECTION]]")
-    parts.append("[[/SECTION]]")
+        parts += [
+            f".. _{label(name)}:",
+            heading(rst_text(name), "~"),
+            f"`Line-by-line detail in gcovr <{gcovr_page(name)}>`__",
+            list_table(f"Summary for {rst_text(name)}", header[1:], [file_row(name, "")[1:]]),
+            list_table(
+                f"Functions in {rst_text(name)}",
+                ["Function", "Status", "Calls", "Lines", "Branches", "Requirements", "Uncovered"],
+                rows,
+                widths="20 8 6 12 12 16 26",
+            ),
+        ]
 
     OUT.parent.mkdir(parents=True, exist_ok=True)
     OUT.write_text("\n\n".join(parts) + "\n", encoding="utf-8")
     print(
-        f"coverage_to_sdoc: wrote {OUT.relative_to(ROOT)} ({len(by_requirement)} requirements {counts}, "
-        f"{number} functions in {len(files)} files, {len(warnings)} warnings)"
+        f"coverage_to_rst: wrote {OUT.relative_to(ROOT)} ({len(by_requirement)} requirements {counts}, "
+        f"{function_count} functions in {len(files)} files, {len(warnings)} warnings)"
     )
     return 0
 

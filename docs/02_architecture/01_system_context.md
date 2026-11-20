@@ -33,16 +33,16 @@ The symbols and colors follow [Diagram conventions](00_diagram_conventions.md). 
 
 | Promise | Requirement |
 | --- | --- |
-| Speed within 2 % of the setpoint, settled within 1 s of start | [LINK: SYS-001] |
-| Start and stop from the buttons | [LINK: SYS-002] |
-| Drive disabled within one 1 ms control period of an overcurrent | [LINK: SYS-003] |
-| Drive disabled when the motor is driven but does not turn | [LINK: SYS-004] |
-| Drive stays off until the operator presses stop to acknowledge a fault | [LINK: SYS-005] |
-| Logic above the HAL port builds unchanged for any MCU | [LINK: SYS-006] |
-| Fixed 1 ms control period, same outputs for the same inputs on every target | [LINK: SYS-007] |
-| All logic above the HAL port tests on a PC | [LINK: SYS-008] |
+| Speed within 2 % of the setpoint, settled within 1 s of start | {need}`SYS-001` |
+| Start and stop from the buttons | {need}`SYS-002` |
+| Drive disabled within one 1 ms control period of an overcurrent | {need}`SYS-003` |
+| Drive disabled when the motor is driven but does not turn | {need}`SYS-004` |
+| Drive stays off until the operator presses stop to acknowledge a fault | {need}`SYS-005` |
+| Logic above the HAL port builds unchanged for any MCU | {need}`SYS-006` |
+| Fixed 1 ms control period, same outputs for the same inputs on every target | {need}`SYS-007` |
+| All logic above the HAL port tests on a PC | {need}`SYS-008` |
 
-The `[LINK: ...]` tags resolve to the requirement pages in the StrictDoc export. On GitHub they show as plain text.
+Each `{need}` role links to the requirement on the Sphinx site. On GitHub it shows as plain text.
 
 ## Out of scope
 

@@ -9,7 +9,7 @@ The firmware runs two periodic jobs, the 1 ms control loop and the 10 ms button 
 
 ## Decision
 
-Use a cooperative scheduler in `src/middleware/scheduler.c`. The caller owns a static array of `sched_task_t` entries with a function, a context pointer and a period. `sched_run(tasks, count, now_ms)` runs each due task in array order and records when it ran. The scheduler reads no clock. The caller passes the tick in, so tests drive time directly ([LINK: SWR-SCH-001]).
+Use a cooperative scheduler in `src/middleware/scheduler.c`. The caller owns a static array of `sched_task_t` entries with a function, a context pointer and a period. `sched_run(tasks, count, now_ms)` runs each due task in array order and records when it ran. The scheduler reads no clock. The caller passes the tick in, so tests drive time directly ({need}`SWR-SCH-001`).
 
 Elapsed time is `now_ms - last_run_ms` in `uint32_t`. Unsigned subtraction gives the right answer across the wrap at `UINT32_MAX`, which comes after 49.7 days of uptime.
 

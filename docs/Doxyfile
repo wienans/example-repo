@@ -18,7 +18,7 @@ SOURCE_BROWSER         = YES
 STRIP_FROM_PATH        = .
 FULL_PATH_NAMES        = YES
 
-# StrictDoc relation markers, e.g. @relation(SWR-PI-001, scope=function),
+# The @relation markers, e.g. @relation(SWR-PI-001, scope=function),
 # render as a "Requirement" paragraph instead of an unknown-command warning.
 ALIASES                = "relation=@par Requirement^^"
 
@@ -32,3 +32,5 @@ WARN_IF_UNDOCUMENTED   = YES
 WARN_NO_PARAMDOC       = YES
 WARN_AS_ERROR          = FAIL_ON_WARNINGS
 QUIET                  = YES
+# Breathe reads the XML for the Sphinx API page.
+GENERATE_XML           = YES

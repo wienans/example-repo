@@ -1,6 +1,6 @@
 # Runtime behavior
 
-The firmware has one thread of control, and no interrupt handlers above the HAL port. `main` calls `app_poll` in an endless loop. `app_poll` reads the millisecond tick once and passes it to `sched_run`, which runs each task whose period has elapsed. The outputs depend only on the tick and on the sampled inputs, which is what [LINK: SYS-007] asks for.
+The firmware has one thread of control, and no interrupt handlers above the HAL port. `main` calls `app_poll` in an endless loop. `app_poll` reads the millisecond tick once and passes it to `sched_run`, which runs each task whose period has elapsed. The outputs depend only on the tick and on the sampled inputs, which is what {need}`SYS-007` asks for.
 
 ## One pass of the main loop
 
@@ -71,7 +71,7 @@ Inside `motor_control_step` the order is fixed:
 4. Move the ramped setpoint toward the target by at most `ramp_rpm_per_tick`.
 5. Run `pi_step` on `ramped setpoint - measured speed`, and return its output as the duty.
 
-Step 2 comes before step 3, so a fault disables the drive in the same call that detects it ([LINK: SWR-CTL-004]). The fault monitor trips on these conditions:
+Step 2 comes before step 3, so a fault disables the drive in the same call that detects it ({need}`SWR-CTL-004`). The fault monitor trips on these conditions:
 
 | Fault | Condition | Default in `app_config.h` |
 | --- | --- | --- |
@@ -82,7 +82,7 @@ Step 2 comes before step 3, so a fault disables the drive in the same call that 
 
 `sched_init` starts every task's first period at the current tick. A task is due when at least `period_ms` has passed since the start of its current period. When the task runs, the start of its period moves forward by exactly `period_ms`, not to the current tick, so the average rate does not drift when a pass is late.
 
-A pass that is late by several periods runs each task at most once. The task then runs on each following pass until it has caught up. The elapsed time is computed in `uint32_t`, so it stays correct across the wrap of the tick after 49.7 days ([LINK: SWR-SCH-001]).
+A pass that is late by several periods runs each task at most once. The task then runs on each following pass until it has caught up. The elapsed time is computed in `uint32_t`, so it stays correct across the wrap of the tick after 49.7 days ({need}`SWR-SCH-001`).
 
 ## Motor states
 
@@ -113,13 +113,13 @@ stateDiagram-v2
   class FAULT fault
 ```
 
-`motor_fsm_next` is a lookup in a `const` table indexed by state and event. Every cell that the diagram does not draw maps a state to itself. In those cells `motor_control_handle` returns early and runs no action. The table is the single source of truth for [LINK: SWR-FSM-001], [LINK: SWR-FSM-002] and [LINK: SWR-FSM-003]. `tests/unit/domain/test_motor_fsm.c` checks all 12 cells.
+`motor_fsm_next` is a lookup in a `const` table indexed by state and event. Every cell that the diagram does not draw maps a state to itself. In those cells `motor_control_handle` returns early and runs no action. The table is the single source of truth for {need}`SWR-FSM-001`, {need}`SWR-FSM-002` and {need}`SWR-FSM-003`. `tests/unit/domain/test_motor_fsm.c` checks all 12 cells.
 
-The entry action on `RUNNING` is the bumpless start of [LINK: SWR-CTL-003]. The ramp starts from the current shaft speed. A motor that is still coasting when the operator presses start keeps turning, instead of being driven back toward zero first.
+The entry action on `RUNNING` is the bumpless start of {need}`SWR-CTL-003`. The ramp starts from the current shaft speed. A motor that is still coasting when the operator presses start keeps turning, instead of being driven back toward zero first.
 
 ## User interface task
 
-The 10 ms task reads both buttons and keeps the previous level of each. A rising edge of the start button sends `START`. A rising edge of the stop button sends `CLEAR_FAULT` when the state is `FAULT`, and `STOP` otherwise ([LINK: SWR-APP-002]). When both buttons rise in the same run, `START` is sent first.
+The 10 ms task reads both buttons and keeps the previous level of each. A rising edge of the start button sends `START`. A rising edge of the stop button sends `CLEAR_FAULT` when the state is `FAULT`, and `STOP` otherwise ({need}`SWR-APP-002`). When both buttons rise in the same run, `START` is sent first.
 
 `app_init` reads the buttons once before the first run. A button held down at power-up therefore produces no edge until it is released and pressed again.
 

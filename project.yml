@@ -15,10 +15,10 @@
     # Writes junit_tests_report.xml per build context: artifacts/test/ for
     # `ceedling test:all`, which tools/check_trace.py reads, and
     # artifacts/gcov/ for `ceedling gcov:all`, which make docs runs and
-    # tools/test_results_to_sdoc.py reads.
+    # tools/test_results_to_rst.py reads.
     - report_tests_log_factory
     # `ceedling gcov:all` runs the suite with coverage. gcovr writes JSON for
-    # tools/coverage_to_sdoc.py and detailed HTML that make docs publishes.
+    # tools/coverage_to_rst.py and detailed HTML that make docs publishes.
     - gcov
 
 :report_tests_log_factory:

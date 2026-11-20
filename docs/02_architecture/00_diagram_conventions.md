@@ -108,8 +108,8 @@ An edge label is a verb phrase, or the name of what crosses the edge: a function
 | C4 notation | Native `C4Context` and `C4Container` first, a flowchart when native C4 drops a relationship | Always a `flowchart` | Native C4 dropped the firmware-to-power-stage relation and labeled hardware as software. See [ADR-0007](../adr/0007-c4-views-as-flowcharts.md) |
 | Quoting | Quote a label that contains `(`, `)`, `[`, `]` or `"` | Quote every label | One rule is easier to review than a list of characters |
 | Symbols | Optional | Required, one per element type | Every diagram here mixes firmware, platform code and hardware. The symbol carries that difference when the colors do not print |
-| `linkStyle` | Allowed for renderers older than Mermaid 11.6 | Never | StrictDoc 0.31 bundles Mermaid 11.12.2, which supports edge IDs |
-| Published form | A fenced block. An image only for targets that cannot render Mermaid | A fenced block. `make diagrams` also writes `.mmd` and `.svg` files to `build/diagrams/` for review | StrictDoc and GitHub render fenced blocks. A committed image drifts from its source |
+| `linkStyle` | Allowed for renderers older than Mermaid 11.6 | Never | Mermaid CLI 11.17 renders every diagram, and it supports edge IDs |
+| Published form | A fenced block. An image only for targets that cannot render Mermaid | A fenced block. `make diagrams` also writes `.mmd` and `.svg` files to `build/diagrams/` for review | Sphinx renders fenced blocks through Mermaid CLI, and GitHub renders them itself. A committed image drifts from its source |
 
 ## Validate a diagram
 
@@ -121,4 +121,4 @@ Run `make diagrams` from the repo root. For each diagram, the tool:
 
 Each failure prints as `file:line: message`. `make docs` runs the same check first.
 
-No script checks the layout. Open each `.svg` file and confirm that every edge and label is visible. Mermaid CLI here is 11.17. StrictDoc bundles 11.12.2, so open the StrictDoc page too when you use a feature newer than 11.12.
+No script checks the layout. Open each `.svg` file and confirm that every edge and label is visible. `make docs` renders the diagrams with the same Mermaid CLI, so the site shows what the `.svg` files show.

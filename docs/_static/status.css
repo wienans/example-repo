@@ -1,0 +1,5 @@
+/* Test results and coverage carry their status as a need style
+   (tools/test_results_to_rst.py, tools/coverage_to_rst.py). */
+.needs_style_passed, .needs_style_full { border-left: 6px solid #2e7d2e !important; }
+.needs_style_partial, .needs_style_skipped { border-left: 6px solid #d99a00 !important; }
+.needs_style_failed, .needs_style_none, .needs_style_not_run { border-left: 6px solid #c62828 !important; }

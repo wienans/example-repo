@@ -1,26 +1,21 @@
 #!/usr/bin/env python3
-"""Turn Ceedling's JUnit report into the "Test results" StrictDoc document.
+"""Turn Ceedling's JUnit report into the "Test results" page.
 
-StrictDoc's own JUnit import does not fit Unity: its dialects resolve a test
-name to a Google Test macro, a Python file or a Rust path, never to a C
-function. So this script writes a native ``.sdoc``, laid out like StrictDoc's
-test report:
+Unity names a test by its C function, which no ready-made JUnit importer maps
+to source. So this script writes ``docs/generated/test_results.rst`` itself:
 
 - a table of all test files with their counts and durations,
-- one section per test file (a heading in the table of contents), opening
-  with that file's summary table,
-- one TEST_RESULT per test with its status, path, function, line, duration,
-  the ``@brief`` of its Doxygen comment, the failure message, a "verifies"
-  relation to each requirement its role=Test marker names, and a File
-  relation to the test function.
+- one section per test file, opening with that file's summary table,
+- one ``test`` need per test with its status, file, function, location,
+  runtime, the ``@brief`` of its Doxygen comment, the failure message, and a
+  ``verifies`` link to each requirement its role=Test marker names.
 
 A failed, skipped or unrun test is a result like any other: it shows, it does
-not stop the build. ``make trace`` is the gate that fails on it.
-
-Each TEST_RESULT UID ends in its status, for tools/strictdoc/site.css.
+not stop the build. ``make trace`` is the gate that fails on it. Each need's
+``:style:`` is its status in lower case, for the colours in docs/_static/.
 
 Run: make docs
-Output: docs/generated/test_results.sdoc (git ignores it)
+Output: docs/generated/test_results.rst (git ignores it)
 """
 
 import dataclasses
@@ -33,69 +28,11 @@ from source_markers import ROOT, read_markers
 
 # make docs runs the suite once, under gcov; that run writes this report.
 JUNIT_REPORT = ROOT / "build" / "ceedling" / "artifacts" / "gcov" / "junit_tests_report.xml"
-# StrictDoc excludes every root .gitignore entry, so build/ is never scanned,
-# and a second export input path breaks the links from requirements to code.
-# docs/generated/ keeps its own .gitignore, which StrictDoc does not read. It
-# sits at the depth of docs/01_requirements/: StrictDoc links a requirement to
-# its code from the depth of the document it is shown in.
-OUT = ROOT / "docs" / "generated" / "test_results.sdoc"
+OUT = ROOT / "docs" / "generated" / "test_results.rst"
 
-# StrictDoc's own label pair for tests. "satisfies" would claim a failed test
-# satisfies its requirement.
-ROLE = "verifies"
-REVERSE_ROLE = "is verified by"
 STATUSES = ("PASSED", "FAILED", "SKIPPED", "NOT_RUN")
 
 BRIEF = re.compile(r"@brief\s+(.*?)\s*(?=\n\s*\*\s*@|\n\s*\*/)", re.DOTALL)
-
-HEADER = f"""\
-[DOCUMENT]
-TITLE: Test results
-OPTIONS:
-  VIEW_STYLE: Table
-
-[GRAMMAR]
-ELEMENTS:
-- TAG: TEXT
-  FIELDS:
-  - TITLE: STATEMENT
-    TYPE: String
-    REQUIRED: True
-- TAG: TEST_RESULT
-  FIELDS:
-  - TITLE: UID
-    TYPE: String
-    REQUIRED: True
-  - TITLE: TITLE
-    TYPE: String
-    REQUIRED: True
-  - TITLE: STATUS
-    TYPE: SingleChoice({", ".join(STATUSES)})
-    REQUIRED: True
-  - TITLE: DESCRIPTION
-    TYPE: String
-    REQUIRED: False
-  - TITLE: TEST_PATH
-    TYPE: String
-    REQUIRED: True
-  - TITLE: TEST_FUNCTION
-    TYPE: String
-    REQUIRED: True
-  - TITLE: LINE
-    TYPE: String
-    REQUIRED: False
-  - TITLE: DURATION
-    TYPE: String
-    REQUIRED: False
-  - TITLE: MESSAGE
-    TYPE: String
-    REQUIRED: False
-  RELATIONS:
-  - TYPE: Parent
-    ROLE: {ROLE}
-    REVERSE_ROLE: {REVERSE_ROLE}
-  - TYPE: File
-"""
 
 
 @dataclasses.dataclass
@@ -200,43 +137,41 @@ def rst_text(value: str) -> str:
     return RST_SPECIAL.sub(r"\\\1", value)
 
 
-def section_uid(path: str) -> str:
-    """The anchor of a test file's section, for links from the overview table."""
-    return "TF-" + pathlib.Path(path).stem
+def label(path: str) -> str:
+    """The label of a test file's section, for links from the overview table."""
+    return "tr-" + re.sub(r"[^a-z0-9]+", "-", path.lower())
 
 
-def text_node(statement: str) -> str:
-    return f"[TEXT]\nSTATEMENT: >>>\n{statement}\n<<<"
+def heading(title: str, underline: str) -> str:
+    return f"{title}\n{underline * len(title)}"
 
 
-def result_node(number: int, test: Test) -> str:
-    node = [
-        "[TEST_RESULT]",
-        # The requirement's Child list shows "UID TITLE", so the UID stays
-        # short: a running number plus the status. The status ends the UID
-        # because StrictDoc's HTML carries the UID in attributes (href,
-        # data-uid) but not the STATUS field, and CSS can only match
-        # attributes. tools/strictdoc/site.css colours on that
-        # suffix. Nothing links to these UIDs by hand, so a UID that
-        # changes with the result is harmless.
-        f"UID: TR-{number:03d}-{test.status}",
-        f"TITLE: {test.function}",
-        f"STATUS: {test.status}",
+def indent(text: str, spaces: int) -> str:
+    return "\n".join(" " * spaces + line if line else "" for line in text.splitlines())
+
+
+def result_need(number: int, test: Test) -> str:
+    need = [
+        f".. test:: {test.function}",
+        f"   :id: TR-{number:03d}",
+        f"   :status: {test.status}",
+        f"   :style: {test.status.lower()}",
     ]
-    if test.brief:
-        node.append(f"DESCRIPTION: {rst_text(test.brief)}")
-    node += [f"TEST_PATH: {test.path}", f"TEST_FUNCTION: {test.function}"]
-    if test.line:
-        node.append(f"LINE: {test.line}")
+    if test.uids:
+        need.append(f"   :verifies: {', '.join(test.uids)}")
+    need += [
+        f"   :file: {test.path}",
+        f"   :function: {test.function}",
+        f"   :location: {test.path}:{test.line}" if test.line else f"   :location: {test.path}",
+    ]
     if test.duration is not None:
-        node.append(f"DURATION: {test.duration:.3f} s")
+        need.append(f"   :runtime: {test.duration:.3f} s")
+    body = []
+    if test.brief:
+        body.append(indent(rst_text(test.brief), 3))
     if test.message:
-        node.append(f"MESSAGE: {rst_text(test.message)}")
-    node.append("RELATIONS:")
-    for uid in test.uids:
-        node += ["- TYPE: Parent", f"  VALUE: {uid}", f"  ROLE: {ROLE}"]
-    node += ["- TYPE: File", f"  VALUE: {test.path}", f"  FUNCTION: {test.function}"]
-    return "\n".join(node)
+        body += ["   Failure message::", indent(test.message, 6)]
+    return "\n".join(need) + ("\n\n" + "\n\n".join(body) if body else "")
 
 
 def main() -> int:
@@ -248,40 +183,30 @@ def main() -> int:
 
     header = ["Test file", "Tests", "Passed", "Failed", "Skipped", "Not run", "Duration"]
     rows = [
-        # Each file name links to its section further down.
-        [f"`{path} <#{section_uid(path)}>`_", *counts(group), f"{suite_durations.get(path, 0):.3f} s"]
+        [f":ref:`{path} <{label(path)}>`", *counts(group), f"{suite_durations.get(path, 0):.3f} s"]
         for path, group in by_file.items()
     ]
     rows.append(["**All files**", *counts(tests), f"{sum(suite_durations.values()):.3f} s"])
-    overview = (
-        f"Generated from ``{JUNIT_REPORT.relative_to(ROOT)}`` by "
-        "``tools/test_results_to_sdoc.py``.\n\n"
-        + list_table("All test files", header, rows, widths="40 10 10 10 10 10 10")
-    )
-
-    # The SDoc grammar allows exactly one blank line between blocks.
-    parts = [HEADER.rstrip("\n"), text_node(overview)]
+    parts = [
+        heading("Test results", "="),
+        f"Generated from ``{JUNIT_REPORT.relative_to(ROOT)}`` by ``tools/test_results_to_rst.py``.",
+        list_table("All test files", header, rows, widths="40 10 10 10 10 10 10"),
+    ]
     number = 0
     for path, group in by_file.items():
-        parts.append(f"[[SECTION]]\nUID: {section_uid(path)}\nTITLE: {path}")
+        parts.append(f".. _{label(path)}:")
+        parts.append(heading(rst_text(path), "-"))
         parts.append(
-            text_node(
-                list_table(
-                    f"Summary for {path}",
-                    header[1:],
-                    [[*counts(group), f"{suite_durations.get(path, 0):.3f} s"]],
-                )
-            )
+            list_table(f"Summary for {rst_text(path)}", header[1:], [[*counts(group), f"{suite_durations.get(path, 0):.3f} s"]])
         )
         for test in group:
             number += 1
-            parts.append(result_node(number, test))
-        parts.append("[[/SECTION]]")
+            parts.append(result_need(number, test))
 
     OUT.parent.mkdir(parents=True, exist_ok=True)
     OUT.write_text("\n\n".join(parts) + "\n", encoding="utf-8")
     summary = dict(zip(STATUSES, counts(tests)[1:]))
-    print(f"test_results_to_sdoc: wrote {OUT.relative_to(ROOT)} ({len(tests)} results in {len(by_file)} files, {summary})")
+    print(f"test_results_to_rst: wrote {OUT.relative_to(ROOT)} ({len(tests)} results in {len(by_file)} files, {summary})")
     return 0
 
 

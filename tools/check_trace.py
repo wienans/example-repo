@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Check that every software requirement is implemented and verified.
 
-Code and tests name a requirement with a StrictDoc marker that carries a role:
+Code and tests name a requirement with an ``@relation`` marker that carries a role:
 
 - ``role=Implementation`` in ``src/``: the function, range or line implements
   the requirement.
@@ -13,20 +13,19 @@ passed in the last Ceedling run. The script reads that result from the JUnit
 report that Ceedling's ``report_tests_log_factory`` plugin writes, so run
 ``make test`` first. ``make trace`` does that.
 
-StrictDoc already rejects markers that name an unknown UID, so this script
-checks the other direction. It fails when:
+``make docs`` already fails on a marker that names an unknown UID, because
+sphinx-needs warns about the dead link. This script checks the other
+direction. It fails when:
 
 - a marker is malformed: it lacks the role its directory needs, sits in a
-  one-line ``/* */`` comment StrictDoc ignores, or is a ``scope=function``
+  one-line ``/* */`` comment, or is a ``scope=function``
   marker not right above a function (see ``source_markers.py``),
 - a ``Test`` marker does not sit on a ``test_*`` function,
 - the JUnit report is missing, or older than a file under ``src/`` or ``tests/``,
 - a software requirement has no passing ``Test`` and no ``Check``,
 - a software requirement has no ``Implementation`` marker. A requirement that a
   ``Check`` verifies is exempt, because it constrains every source file rather
-  than naming one,
-- a ``docs/01_requirements/software_*.sdoc`` domain file is not included by
-  ``software_requirements.sdoc``, because StrictDoc would silently leave it out.
+  than naming one.
 
 This script checks traceability, not layering or determinism, so it carries no
 marker of its own. A marker here would count as evidence for a requirement it
@@ -40,36 +39,18 @@ import xml.etree.ElementTree as ET
 
 from source_markers import ROOT, Marker, read_markers
 
-# PARENT includes one software_<domain>.sdoc per domain from its own folder.
-# StrictDoc links a requirement to its code from the depth of the file that
-# defines it, so the domain files sit next to PARENT, not in a subfolder.
-PARENT = ROOT / "docs" / "01_requirements" / "software_requirements.sdoc"
-REQUIREMENTS_DIR = PARENT.parent
-DOMAIN_GLOB = "software_*.sdoc"
+REQUIREMENTS_DIR = ROOT / "docs" / "01_requirements"
 JUNIT_REPORT = ROOT / "build" / "ceedling" / "artifacts" / "test" / "junit_tests_report.xml"
 # A report older than any of these files does not describe the current code.
 REPORT_INPUTS = [ROOT / "src", ROOT / "tests", ROOT / "project.yml"]
 
-UID_LINE = re.compile(r"^UID:\s*(SWR-[A-Z]+-\d+)\s*$", re.MULTILINE)
-INCLUDE = re.compile(r"^\[DOCUMENT_FROM_FILE\]\nFILE:\s*(\S+)\s*$", re.MULTILINE)
-
-
-def unincluded_files() -> list[pathlib.Path]:
-    """Domain files that the parent does not include, so StrictDoc never shows them."""
-    included = {
-        (PARENT.parent / f).resolve()
-        for f in INCLUDE.findall(PARENT.read_text(encoding="utf-8"))
-    }
-    return [p for p in domain_files() if p.resolve() not in included]
-
-
-def domain_files() -> list[pathlib.Path]:
-    return [p for p in sorted(REQUIREMENTS_DIR.glob(DOMAIN_GLOB)) if p != PARENT]
+# The :id: option of a ".. swr::" need.
+UID_LINE = re.compile(r"^\s+:id:\s*(SWR-[A-Z]+-\d+)\s*$", re.MULTILINE)
 
 
 def defined_uids() -> dict[str, pathlib.Path]:
     found: dict[str, pathlib.Path] = {}
-    for path in domain_files():
+    for path in sorted(REQUIREMENTS_DIR.glob("*.rst")):
         for uid in UID_LINE.findall(path.read_text(encoding="utf-8")):
             found[uid] = path
     return found
@@ -120,8 +101,6 @@ def main() -> int:
         print(f"check_trace: no requirements found in {REQUIREMENTS_DIR.relative_to(ROOT)}")
         return 1
     problems: list[str] = []
-    for path in unincluded_files():
-        problems.append(f"{path.relative_to(ROOT)}: not included by {PARENT.relative_to(ROOT)}")
 
     markers, marker_errors = collect_markers()
     problems.extend(marker_errors)

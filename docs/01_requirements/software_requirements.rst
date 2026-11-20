@@ -1,18 +1,9 @@
-[DOCUMENT]
-MID: 384be1118404454192d2917e1083d72c
-TITLE: Software requirements
-UID: DOC-SWR
-OPTIONS:
-  ENABLE_MID: True
-  VIEW_STYLE: Table
+Software requirements
+=====================
 
-[[SECTION]]
-MID: 811c4244304c46d08e94da7fcc625298
-TITLE: Conventions
+Conventions
+-----------
 
-[TEXT]
-MID: a0de5ed0721a4c66b0aaaf2eaa6c0369
-STATEMENT: >>>
 Each requirement names the module that implements it. Code and tests point back
 at a requirement with a marker inside their Doxygen comment, in the form
 ``@relation(SWR-PI-001, scope=function, role=Implementation)``. The role is
@@ -26,30 +17,15 @@ implementation, or when none of its tests passed in the last Ceedling run.
 Units: speed in rpm (``rpm_t``), current in mA (``milliamp_t``), and duty in
 permille from -1000 to 1000 (``duty_permille_t``). The sign of the duty sets
 the direction of rotation.
-<<<
 
-[[/SECTION]]
+.. toctree::
+   :maxdepth: 1
 
-[DOCUMENT_FROM_FILE]
-FILE: software_pi_controller.sdoc
-
-[DOCUMENT_FROM_FILE]
-FILE: software_motor_state_machine.sdoc
-
-[DOCUMENT_FROM_FILE]
-FILE: software_fault_monitor.sdoc
-
-[DOCUMENT_FROM_FILE]
-FILE: software_motor_control.sdoc
-
-[DOCUMENT_FROM_FILE]
-FILE: software_scheduler.sdoc
-
-[DOCUMENT_FROM_FILE]
-FILE: software_board_support_package.sdoc
-
-[DOCUMENT_FROM_FILE]
-FILE: software_application.sdoc
-
-[DOCUMENT_FROM_FILE]
-FILE: software_architecture_constraints.sdoc
+   software_pi_controller
+   software_motor_state_machine
+   software_fault_monitor
+   software_motor_control
+   software_scheduler
+   software_board_support_package
+   software_application
+   software_architecture_constraints

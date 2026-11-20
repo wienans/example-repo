@@ -10,10 +10,10 @@ You need the vendor's C toolchain, and its peripheral library or register header
 
 1. Create `src/hal/port/<mcu>/`.
 2. Implement every function that `src/hal/hal_tick.h`, `hal_gpio.h`, `hal_pwm.h`, `hal_encoder.h` and `hal_adc.h` declare. Use `src/hal/port/host/hal_host.c` as the reference for signatures and return values.
-3. Return `HAL_INVALID_ARG` from an `*_init` function for a pin, channel or encoder that the MCU does not have. Return `HAL_ERROR` when a peripheral fails to start. `bsp_init` stops at the first status that is not `HAL_OK`, and `main` then keeps the drive disabled forever ([LINK: SWR-BSP-004]).
+3. Return `HAL_INVALID_ARG` from an `*_init` function for a pin, channel or encoder that the MCU does not have. Return `HAL_ERROR` when a peripheral fails to start. `bsp_init` stops at the first status that is not `HAL_OK`, and `main` then keeps the drive disabled forever ({need}`SWR-BSP-004`).
 4. Make `hal_gpio_init` start an output pin low. The enable pin is an output, and a low enable lets the motor coast until the firmware starts.
-5. Make `hal_tick_ms` return a free-running millisecond counter that wraps at `UINT32_MAX`, without blocking. The scheduler handles the wrap ([LINK: SWR-SCH-001]).
-6. Make `hal_encoder_count` return the raw 16-bit timer count in quadrature mode, counting all four edges. The BSP handles the wrap ([LINK: SWR-BSP-001]).
+5. Make `hal_tick_ms` return a free-running millisecond counter that wraps at `UINT32_MAX`, without blocking. The scheduler handles the wrap ({need}`SWR-SCH-001`).
+6. Make `hal_encoder_count` return the raw 16-bit timer count in quadrature mode, counting all four edges. The BSP handles the wrap ({need}`SWR-BSP-001`).
 7. Make `hal_pwm_set_duty` accept 0 to 1000 permille. The BSP passes the magnitude and sets the direction on a separate pin.
 8. Make `hal_adc_read` run one blocking conversion and return the right-aligned raw result.
 9. Include only the HAL headers, your vendor headers and the C library in the port. `make lint` does not check files under `src/hal/port/`, so a reviewer checks this. The host port also includes `board_config.h` and `app.h` for the simulator. A target port has no need for either.

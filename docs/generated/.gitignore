@@ -1,4 +1,4 @@
-# make docs writes the test results and coverage documents here. They live
-# under docs/ so StrictDoc finds them; see the docs target in the Makefile.
+# make reports writes the code traceability, test results and coverage pages
+# here; see the reports target in the Makefile.
 *
 !.gitignore

@@ -1,0 +1,11 @@
+# The documentation toolchain: pip install -r docs/requirements.txt
+# gcovr turns the gcov counters into the coverage report make docs reads.
+sphinx==9.0.4
+sphinx-needs==9.3.0
+breathe==5.1.0
+myst-parser==5.2.0
+sphinxcontrib-mermaid==2.1.1
+furo==2025.12.19
+# needpie on the traceability page plots with matplotlib.
+matplotlib==3.11.2
+gcovr==8.8

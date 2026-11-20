@@ -5,7 +5,7 @@
 
 ## Context
 
-The firmware must run on more than one MCU ([LINK: SYS-006]) and must test on a PC ([LINK: SYS-008]). The hardware boundary needs an interface that a port can implement and a test can replace. Two shapes fit.
+The firmware must run on more than one MCU ({need}`SYS-006`) and must test on a PC ({need}`SYS-008`). The hardware boundary needs an interface that a port can implement and a test can replace. Two shapes fit.
 
 | | Function-pointer table | Link-time port |
 | --- | --- | --- |
@@ -20,7 +20,7 @@ The firmware must run on more than one MCU ([LINK: SYS-006]) and must test on a 
 
 Use link-time ports. Each HAL header in `src/hal/` declares functions that take a small integer channel or pin ID. Each MCU gets a directory `src/hal/port/<mcu>/` that defines those functions. The build compiles exactly one port.
 
-Only files in `src/hal/port/` include vendor headers. `tools/check_layers.py` fails the build otherwise ([LINK: SWR-ARC-001]).
+Only files in `src/hal/port/` include vendor headers. `tools/check_layers.py` fails the build otherwise ({need}`SWR-ARC-001`).
 
 ## Consequences
 

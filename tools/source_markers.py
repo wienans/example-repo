@@ -1,8 +1,8 @@
-"""Read the StrictDoc @relation markers in src/, tests/ and tools/.
+"""Read the @relation markers in src/, tests/ and tools/.
 
-check_trace.py, test_results_to_sdoc.py and coverage_to_sdoc.py all work from
-these markers, so they read them in one place and the way StrictDoc's C reader
-does:
+check_trace.py, test_results_to_rst.py, coverage_to_rst.py and code_to_rst.py
+all work from these markers, so they read them in one place, with the rules of
+StrictDoc's C reader that the markers were written for:
 
 - A marker may sit in a ``/* */`` or a ``//`` comment. StrictDoc finds nothing
   in a one-line ``/* @relation(...) */``, so such a marker is an error here
@@ -96,3 +96,59 @@ def read_markers() -> tuple[list[Marker], list[str]]:
                     marker.function = function.group(1)
                 markers.append(marker)
     return markers, errors
+
+
+@dataclasses.dataclass
+class Piece:
+    """The code one marker names: a function, a range, a line or a file."""
+
+    file: str
+    kind: str  # function, range, line or file
+    uids: list[str]
+    line: int  # the marker's line; the range_start marker's for a range
+    function: str = ""
+    first: int = 0
+    last: int = 0
+
+    @property
+    def where(self) -> str:
+        return f"{self.file}:{self.line}"
+
+    def label(self) -> str:
+        if self.kind == "function":
+            return f"``{self.function}`` in ``{self.file}``"
+        if self.kind == "file":
+            return f"``{self.file}`` (whole file)"
+        return f"``{self.file}:{self.first}-{self.last}`` ({self.kind})"
+
+
+def code_pieces(markers: list[Marker], role: str) -> tuple[list[Piece], list[str]]:
+    """The markers of one role as Pieces, a range_start paired with its range_end,
+    and the markers that cannot be placed."""
+    found: list[Piece] = []
+    warnings: list[str] = []
+    open_ranges: dict[str, list[tuple[list[str], int]]] = {}
+    for marker in markers:
+        if marker.role != role:
+            continue
+        stack = open_ranges.setdefault(marker.file, [])
+        if marker.scope == "function":
+            found.append(Piece(marker.file, "function", marker.uids, marker.line, function=marker.function))
+        elif marker.scope == "file":
+            found.append(Piece(marker.file, "file", marker.uids, marker.line))
+        elif marker.scope == "line":
+            found.append(Piece(marker.file, "line", marker.uids, marker.line, first=marker.line, last=marker.line + 1))
+        elif marker.scope == "range_start":
+            stack.append((marker.uids, marker.line))
+        elif marker.scope == "range_end":
+            if not stack or stack[-1][0] != marker.uids:
+                warnings.append(f"{marker.where}: range_end without a matching range_start")
+                continue
+            _, start = stack.pop()
+            found.append(Piece(marker.file, "range", marker.uids, start, first=start, last=marker.line))
+        else:
+            warnings.append(f"{marker.where}: unsupported scope '{marker.scope}'")
+    for file, stack in open_ranges.items():
+        for _, start in stack:
+            warnings.append(f"{file}:{start}: range_start without a range_end")
+    return found, warnings
