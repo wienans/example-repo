@@ -1,6 +1,6 @@
 # ADR-0006 Documentation toolchain
 
-- Status: accepted
+- Status: superseded by [ADR-0008](0008-sphinx-documentation-toolchain.md)
 - Date: 2026-11-18
 
 ## Context
